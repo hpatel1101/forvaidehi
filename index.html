@@ -9,8 +9,6 @@
   :root{
     --pink-bg:#ffb6c1;
     --btn:#ff2e63;
-    --btn-yes:#2ecc71;
-    --btn-no:#3b3b45;
     --text:#1a1a1a;
     --photo-size:260px;
     --photo-radius:18px;
@@ -81,24 +79,7 @@
   #question{
     display:none;
     min-height:100vh;
-    padding:14vh 18px 40px;
-    position:relative;
-  }
-
-  .card{
-    width:min(520px, 92vw);
-    margin:0 auto;
-    background:rgba(255,255,255,.42);
-    backdrop-filter: blur(4px);
-    border-radius:24px;
-    padding:22px 18px 24px;
-    box-shadow:0 12px 30px rgba(0,0,0,.12);
-    animation:fadeUp .5s ease;
-  }
-
-  @keyframes fadeUp{
-    from{ opacity:0; transform:translateY(10px); }
-    to{ opacity:1; transform:translateY(0); }
+    padding:18vh 18px 40px;
   }
 
   h1{
@@ -121,64 +102,9 @@
     opacity:.78;
   }
 
-  .actions{
-    margin-top:18px;
-    display:flex;
-    justify-content:center;
-    gap:10px;
-    position:relative;
-    min-height:54px;
-  }
-
-  .v-btn{
-    border:none;
-    border-radius:999px;
-    padding:12px 20px;
-    font-size:1rem;
-    font-weight:700;
-    color:white;
-    cursor:pointer;
-    box-shadow:0 8px 16px rgba(0,0,0,.15);
-    transition:transform .15s ease, filter .15s ease;
-  }
-
-  .v-btn:hover{ transform:translateY(-1px); filter:brightness(1.06); }
-  .v-btn:active{ transform:translateY(1px); }
-  #yesBtn{ background:var(--btn-yes); }
-  #noBtn{ background:var(--btn-no); }
-
-  #response{
-    min-height:1.5em;
-    margin-top:14px;
-    font-weight:700;
-    font-size:1.03rem;
-  }
-
-  .shake{ animation:shake .25s linear; }
-  @keyframes shake{
-    0%{ transform:translateX(0); }
-    25%{ transform:translateX(-6px); }
-    50%{ transform:translateX(6px); }
-    75%{ transform:translateX(-4px); }
-    100%{ transform:translateX(0); }
-  }
-
-  .heart-burst{
-    position:absolute;
-    font-size:26px;
-    pointer-events:none;
-    animation:burst 1.2s ease-out forwards;
-  }
-
-  @keyframes burst{
-    0%{ opacity:0; transform:translate(-50%, -50%) scale(.5); }
-    20%{ opacity:1; }
-    100%{ opacity:0; transform:translate(var(--tx), var(--ty)) scale(1.15); }
-  }
-
   @media (prefers-reduced-motion: reduce){
-    .fly, .card, .shake, .heart-burst{ animation-duration:1ms !important; }
-    #startBtn, .v-btn{ transition:none; }
+    .fly{ animation-duration:1ms; }
+    #startBtn{ transition:none; }
   }
 </style>
 </head>
@@ -187,21 +113,12 @@
 
 <div id="startWrap">
   <button id="startBtn" aria-describedby="hint">Hardik wants you to click here ❤️</button>
-  <p id="hint">P.S. It gets cute in 3…2…1 ✨</p>
+  <p id="hint"></p>
 </div>
 
 <div id="question" aria-live="polite">
-  <div class="card">
-    <h1>Will you be my Valentine? 💘</h1>
-    <img id="me" src="me.jpg" alt="Photo of me smiling">
-
-    <div class="actions">
-      <button class="v-btn" id="yesBtn">Yes 💖</button>
-      <button class="v-btn" id="noBtn">No 🙈</button>
-    </div>
-
-    <p id="response"></p>
-  </div>
+  <h1>Will you be my Valentine? 💘</h1>
+  <img id="me" src="me.jpg" alt="Photo of me smiling">
 </div>
 
 <script>
@@ -209,27 +126,13 @@ const TOTAL = 10;
 const GAP_MS = 600;
 const DURATION_MS = 3400;
 const PHOTO_COUNT = 5;
-const NO_TEXTS = [
-  "No? Are you sure sure? 😅",
-  "The no button is feeling shy…",
-  "Plot twist: you meant yes 😌",
-  "No is currently on vacation 🏝️",
-  "Try again, cutie 💕"
-];
 
 const startBtn = document.getElementById("startBtn");
 const startWrap = document.getElementById("startWrap");
 const question = document.getElementById("question");
-const noBtn = document.getElementById("noBtn");
-const yesBtn = document.getElementById("yesBtn");
-const response = document.getElementById("response");
-let noCount = 0;
 
 preloadPhotos();
 startBtn.addEventListener("click", start, { once:true });
-noBtn.addEventListener("mouseenter", dodgeNo);
-noBtn.addEventListener("click", dodgeNo);
-yesBtn.addEventListener("click", sayYes);
 
 function preloadPhotos(){
   for (let i = 1; i <= PHOTO_COUNT; i++) {
@@ -254,6 +157,7 @@ function start(){
   }, GAP_MS);
 
   spawnOne(i);
+  i++;
 }
 
 function spawnOne(i){
