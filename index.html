@@ -1,185 +1,225 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Valentine?</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>💘</title>
 
 <style>
+  :root{
+    --bg1:#ff6aa2;
+    --bg2:#ffd1dc;
+    --card:#ffffffcc;
+    --text:#1b1b1b;
+    --accent:#ff2e63;
+  }
+
+  html,body{height:100%;}
   body{
     margin:0;
-    font-family:-apple-system, BlinkMacSystemFont, "Apple Color Emoji","Segoe UI Emoji", sans-serif;
-    background:#ffb6c1;
-    text-align:center;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;
+    background: radial-gradient(1200px 800px at 20% 20%, #fff 0%, var(--bg2) 35%, var(--bg1) 100%);
+    color:var(--text);
     overflow:hidden;
   }
 
-  #startBtn{
-    margin-top:40vh;
-    padding:20px 28px;
-    font-size:22px;
-    border:none;
-    border-radius:16px;
-    background:#ff2e63;
-    color:#fff;
-    box-shadow: 0 14px 30px rgba(0,0,0,.18);
+  .wrap{
+    position:relative;
+    height:100%;
+    display:grid;
+    place-items:center;
+    padding:24px;
   }
 
-  /* question card (looks nicer + gives photos something to frame) */
-  #question{
-    display:none;
-    position:fixed;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    width:min(360px, 86vw);
-    padding:18px 16px 16px;
-    border-radius:24px;
-    background: rgba(255,255,255,.35);
+  .card{
+    width:min(440px, 92vw);
+    background:var(--card);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,.35);
-    box-shadow: 0 20px 50px rgba(0,0,0,.18);
-    z-index:5;
+    border:1px solid #ffffff80;
+    border-radius:28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    padding:22px 18px 18px;
+    text-align:center;
   }
 
-  h1{
-    margin:4px 0 0;
-    font-size:36px;
-    color:#1a1a1a;
-    text-shadow: 0 2px 0 rgba(255,255,255,.25);
+  .title{
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.2px;
+    margin:6px 0 14px;
   }
 
-  #me{
-    width:240px;
-    border-radius:22px;
-    margin-top:14px;
-    box-shadow: 0 14px 30px rgba(0,0,0,.22);
+  .sub{
+    font-size:14px;
+    opacity:.75;
+    margin:0 0 18px;
   }
 
-  /* BIG drifting photos */
-  .fly{
-    position:fixed;                 /* fixed so it behaves nicely with card */
-    width:260px;
-    max-width:70vw;
-    height:auto;
+  button{
+    appearance:none;
+    border:none;
     border-radius:18px;
-    box-shadow: 0 14px 30px rgba(0,0,0,.22);
-    opacity: 0;
-    transform: translate(0,0) scale(0.98);
+    background:linear-gradient(135deg, var(--accent), #ff7aa2);
+    color:white;
+    font-weight:800;
+    font-size:18px;
+    padding:16px 18px;
+    width:100%;
+    box-shadow:0 10px 30px rgba(255,46,99,.35);
+    transform:translateZ(0);
+  }
+  button:active{ transform: scale(.98) translateZ(0); }
+
+  .question{
+    display:none;
+    margin-top:14px;
+  }
+  .question h1{
+    margin:12px 0 10px;
+    font-size:28px;
+    line-height:1.1;
+  }
+
+  .me{
+    width:220px;
+    max-width:70%;
+    border-radius:24px;
+    border:2px solid #fff;
+    box-shadow:0 12px 30px rgba(0,0,0,.18);
+  }
+
+  /* flying photos layer */
+  .layer{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+  }
+  .fly{
+    position:absolute;
+    width:84px;
+    height:84px;
+    object-fit:cover;
+    border-radius:18px;
+    box-shadow:0 10px 24px rgba(0,0,0,.20);
     will-change: transform, opacity;
-    animation: driftAway 3.4s ease-in-out forwards;
-    z-index:3;
+    transform: translate3d(0,0,0);
   }
 
-  @keyframes driftAway{
-    0%   { opacity:0; transform: translate(0,0) scale(0.98); }
-    12%  { opacity:1; transform: translate(0,0) scale(1.00); }
-    85%  { opacity:1; transform: translate(var(--x), var(--y)) scale(1.00); }
-    100% { opacity:0; transform: translate(var(--x), var(--y)) scale(0.98); }
+  /* tiny hearts in background (nice touch, low cost) */
+  .heart{
+    position:absolute;
+    font-size:18px;
+    opacity:.22;
+    animation: floatUp 6s linear infinite;
   }
-
-  /* When we "lock" a photo into the frame, it becomes a tile */
-  .locked{
-    opacity:1 !important;
-    animation:none !important;
-    transform: translate(0,0) scale(1) !important;
-    transition: left 900ms cubic-bezier(.2,.9,.2,1), top 900ms cubic-bezier(.2,.9,.2,1);
-    z-index:4;
+  @keyframes floatUp{
+    from{ transform: translate3d(0, 20px, 0); }
+    to{ transform: translate3d(0, -120vh, 0); }
   }
 </style>
 </head>
 
 <body>
+<div class="wrap">
+  <div class="layer" id="layer"></div>
 
-<button id="startBtn">Hardik wants you to click here ❤️</button>
+  <div class="card">
+    <div class="title">A message for you 💌</div>
+    <p class="sub">Tap the button. Don’t overthink it 🙂</p>
 
-<div id="question">
-  <h1>Will you be my Valentine? 💘</h1>
-  <img id="me" src="me.jpg" alt="me">
+    <button id="startBtn">Hardik wants you to click here ❤️</button>
+
+    <div class="question" id="question">
+      <h1>Will you be my Valentine? 💘</h1>
+      <img class="me" src="me.jpg" alt="me">
+    </div>
+  </div>
 </div>
 
 <script>
-const TOTAL = 8;         // how many photos will end up framing the card
-const GAP_MS = 650;      // slower sequence
-const DURATION_MS = 3400;
+  // Put your 5 pics here (must exist in same folder):
+  const pics = ["pic1.jpg","pic2.jpg","pic3.jpg","pic4.jpg","pic5.jpg"];
 
-// Frame positions around the question card (offsets from center).
-// These are tuned to look good on iPhone.
-const frameSpots = [
-  { x: -200, y: -240 },
-  { x:    0, y: -260 },
-  { x:  200, y: -240 },
-  { x: -240, y:  -40 },
-  { x:  240, y:  -40 },
-  { x: -200, y:  200 },
-  { x:    0, y:  220 },
-  { x:  200, y:  200 }
-];
+  // Lightweight background hearts
+  const layer = document.getElementById("layer");
+  for(let i=0;i<14;i++){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.textContent = Math.random()>.5 ? "💗" : "💖";
+    h.style.left = (Math.random()*100)+"vw";
+    h.style.top = (60 + Math.random()*60)+"vh";
+    h.style.animationDelay = (-Math.random()*6)+"s";
+    h.style.fontSize = (14 + Math.random()*16)+"px";
+    layer.appendChild(h);
+  }
 
-document.getElementById("startBtn").addEventListener("click", start, { once:true });
+  // Preload images to prevent “glitchy” first-run
+  function preload(list){
+    return Promise.all(list.map(src => new Promise(res=>{
+      const im=new Image();
+      im.onload=()=>res(true);
+      im.onerror=()=>res(true);
+      im.src=src;
+    })));
+  }
 
-function start(){
-  document.getElementById("startBtn").style.display = "none";
+  function burst(){
+    const W = window.innerWidth;
+    const H = window.innerHeight;
 
-  let i = 0;
-  const timer = setInterval(() => {
-    spawnOne(i);
-    i++;
-    if (i >= TOTAL) {
-      clearInterval(timer);
-      // Show the card shortly before the last photos lock in
-      setTimeout(() => {
-        document.getElementById("question").style.display = "block";
-      }, 900);
+    // fewer elements = smoother on iPhone
+    const count = 12;
+
+    for(let i=0;i<count;i++){
+      const img=document.createElement("img");
+      img.className="fly";
+      img.src = pics[i % pics.length];
+
+      // start near the button/card center
+      const startX = W/2 + (Math.random()*40 - 20);
+      const startY = H/2 + (Math.random()*40 - 20);
+
+      img.style.left = (startX - 42) + "px";
+      img.style.top  = (startY - 42) + "px";
+      layer.appendChild(img);
+
+      // send outward
+      const angle = Math.random()*Math.PI*2;
+      const dist  = 420 + Math.random()*520;
+      const endX  = Math.cos(angle)*dist;
+      const endY  = Math.sin(angle)*dist;
+
+      const rot = (Math.random()*900 - 450);
+
+      img.animate([
+        { transform:`translate3d(0,0,0) rotate(0deg) scale(1)`, opacity: 1 },
+        { transform:`translate3d(${endX}px,${endY}px,0) rotate(${rot}deg) scale(.85)`, opacity: 0 }
+      ],{
+        duration: 750,
+        easing: "cubic-bezier(.2,.9,.2,1)",
+        fill: "forwards",
+        delay: i*18
+      });
+
+      // clean up after animation
+      setTimeout(()=> img.remove(), 1200);
     }
-  }, GAP_MS);
-}
+  }
 
-function spawnOne(i){
-  const img = document.createElement("img");
-  img.src = "pic" + ((i % 5) + 1) + ".jpg";
-  img.className = "fly";
+  const btn = document.getElementById("startBtn");
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    btn.textContent = "Loading… 💞";
 
-  // Start near center so you can SEE it clearly
-  const startX = window.innerWidth * 0.5;
-  const startY = window.innerHeight * 0.48;
+    // preload burst photos + me.jpg
+    await preload([...pics, "me.jpg"]);
 
-  // Center the image around start point (approx half width/height)
-  img.style.left = (startX - 130) + "px";
-  img.style.top  = (startY - 90) + "px";
-
-  // Gentle outward drift
-  const driftX = (Math.random() * 520 - 260);
-  const driftY = (Math.random() * 520 - 260);
-  img.style.setProperty("--x", driftX + "px");
-  img.style.setProperty("--y", driftY + "px");
-
-  document.body.appendChild(img);
-
-  // After the drift finishes, "lock" it into a frame spot and keep it
-  setTimeout(() => {
-    lockIntoFrame(img, i);
-  }, DURATION_MS - 200);
-}
-
-function lockIntoFrame(img, i){
-  const spot = frameSpots[i % frameSpots.length];
-
-  // Ensure question card is visible by the time we lock
-  document.getElementById("question").style.display = "block";
-
-  // Convert to locked tile
-  img.classList.add("locked");
-
-  // Position relative to center of screen
-  const centerX = window.innerWidth * 0.5;
-  const centerY = window.innerHeight * 0.5;
-
-  // Move it to the target "frame" position
-  img.style.left = (centerX + spot.x - 130) + "px";
-  img.style.top  = (centerY + spot.y - 90) + "px";
-}
+    btn.style.display = "none";
+    burst();
+    setTimeout(()=> {
+      document.getElementById("question").style.display="block";
+    }, 900);
+  });
 </script>
-
 </body>
 </html>
