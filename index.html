@@ -102,6 +102,63 @@
     opacity:.78;
   }
 
+  /* ===== ADDED STYLES ONLY ===== */
+
+  #btnRow{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-top:16px;
+  }
+
+  #yesBtn, #noBtn{
+    padding:14px 18px;
+    border:none;
+    border-radius:16px;
+    font-size:1.1rem;
+    font-weight:750;
+    cursor:pointer;
+    box-shadow:0 12px 26px rgba(0,0,0,.18);
+  }
+
+  #yesBtn{
+    background:var(--btn);
+    color:#fff;
+  }
+
+  #noBtn{
+    background:#fff;
+    color:var(--text);
+  }
+
+  #response{
+    margin:14px 0 0;
+    min-height:28px;
+    font-size:1.05rem;
+    font-weight:650;
+  }
+
+  .shake{
+    animation:shake .35s linear;
+  }
+  @keyframes shake{
+    0%,100%{ transform:translateX(0); }
+    25%{ transform:translateX(-6px); }
+    75%{ transform:translateX(6px); }
+  }
+
+  .heart-burst{
+    position:fixed;
+    font-size:26px;
+    pointer-events:none;
+    animation:pop 1.25s ease forwards;
+  }
+  @keyframes pop{
+    0%{ opacity:0; transform:scale(.8); }
+    15%{ opacity:1; transform:scale(1); }
+    100%{ opacity:0; transform:translate(var(--tx), var(--ty)) scale(1.15); }
+  }
+
   @media (prefers-reduced-motion: reduce){
     .fly{ animation-duration:1ms; }
     #startBtn{ transition:none; }
@@ -119,6 +176,13 @@
 <div id="question" aria-live="polite">
   <h1>Will you be my Valentine? 💘</h1>
   <img id="me" src="me.jpg" alt="Photo of me smiling">
+
+  <!-- ===== ADDED HTML ONLY ===== -->
+  <p id="response"></p>
+  <div id="btnRow">
+    <button id="yesBtn">Yes 💘</button>
+    <button id="noBtn">No 🙃</button>
+  </div>
 </div>
 
 <script>
@@ -131,8 +195,26 @@ const startBtn = document.getElementById("startBtn");
 const startWrap = document.getElementById("startWrap");
 const question = document.getElementById("question");
 
+/* ===== ADDED JS ONLY ===== */
+const yesBtn = document.getElementById("yesBtn");
+const noBtn  = document.getElementById("noBtn");
+const response = document.getElementById("response");
+
+const NO_TEXTS = [
+  "Wait… are you sure? 🥺",
+  "No? I’ll ask again 😤",
+  "That button is kinda slippery 😌",
+  "C’mon… say yes 💖",
+  "Okay okay… you win 😭"
+];
+let noCount = 0;
+
 preloadPhotos();
 startBtn.addEventListener("click", start, { once:true });
+
+yesBtn.addEventListener("click", sayYes);
+noBtn.addEventListener("mouseenter", dodgeNo);
+noBtn.addEventListener("click", dodgeNo);
 
 function preloadPhotos(){
   for (let i = 1; i <= PHOTO_COUNT; i++) {
@@ -169,7 +251,9 @@ function spawnOne(i){
   const startX = window.innerWidth * 0.5;
   const startY = window.innerHeight * 0.48;
 
-  const halfWidth = Math.min(parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--photo-size")) || 260, window.innerWidth * 0.35) / 2;
+  const halfWidth = Math.min(parseFloat(getComputedStyle(document.documentElement)
+    .getPropertyValue("--photo-size")) || 260, window.innerWidth * 0.35) / 2;
+
   img.style.left = `${startX - halfWidth}px`;
   img.style.top = `${startY - 90}px`;
 
@@ -202,7 +286,6 @@ function sayYes(){
   noBtn.style.display = "none";
   yesBtn.textContent = "My Valentine ✅";
   yesBtn.disabled = true;
-  yesBtn.style.opacity = ".9";
 
   for (let i = 0; i < 16; i++) {
     setTimeout(() => burstHeart(), i * 90);
