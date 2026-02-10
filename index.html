@@ -6,12 +6,13 @@
   <title>Valentine</title>
   <style>
     :root {
-      --bg-start: #1a1020;
+      --bg-start: #1f1127;
       --bg-end: #090a0f;
-      --card: rgba(255, 255, 255, 0.09);
+      --card: rgba(255, 255, 255, 0.1);
       --text: #ffffff;
-      --yes: #23c766;
+      --yes: #2ad86f;
       --no: #ff3b5c;
+      --outline: rgba(255, 255, 255, 0.18);
     }
 
     * { box-sizing: border-box; }
@@ -22,7 +23,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(1200px 800px at 50% -10%, #3a1f46 0%, transparent 45%),
+        radial-gradient(1200px 800px at 50% -10%, #492657 0%, transparent 45%),
         linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 80%);
     }
 
@@ -30,36 +31,95 @@
       display: grid;
       place-items: center;
       padding: 18px;
+      overflow-x: hidden;
     }
 
     .app {
-      width: min(430px, 100%);
+      width: min(440px, 100%);
       text-align: center;
+      position: relative;
     }
 
     #startBtn {
       width: 100%;
-      min-height: 96px;
+      min-height: 108px;
       border: 0;
-      border-radius: 20px;
-      padding: 18px;
-      font-size: clamp(1.2rem, 4.7vw, 1.5rem);
-      font-weight: 750;
+      border-radius: 24px;
+      padding: 20px 16px;
+      font-size: clamp(1.15rem, 4.4vw, 1.45rem);
+      font-weight: 780;
       letter-spacing: 0.01em;
       color: #fff;
-      background: var(--card);
+      background:
+        radial-gradient(circle at 20% 18%, rgba(255, 171, 204, 0.34), transparent 40%),
+        radial-gradient(circle at 82% 16%, rgba(162, 194, 255, 0.26), transparent 40%),
+        linear-gradient(135deg, rgba(255, 78, 128, 0.36), rgba(111, 66, 193, 0.45));
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+      box-shadow:
+        0 16px 44px rgba(0, 0, 0, 0.35),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+        inset 0 -18px 28px rgba(0, 0, 0, 0.16);
       -webkit-tap-highlight-color: transparent;
-      transition: transform 180ms ease;
+      transition: transform 180ms ease, box-shadow 220ms ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
 
+    #startBtn::after {
+      content: "💌 tap to open";
+      display: block;
+      margin-top: 8px;
+      font-size: 0.92rem;
+      font-weight: 620;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    #startBtn:hover { box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
     #startBtn:active { transform: scale(0.98); }
+
+    .intro-burst {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      opacity: 0;
+    }
+
+    .intro-burst.show {
+      opacity: 1;
+      animation: burstFade 900ms ease forwards;
+    }
+
+    .heart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      font-size: 20px;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.2);
+      animation: heartPop 1000ms ease forwards;
+    }
+
+    @keyframes heartPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+      20% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--x, 0px)), calc(-50% + var(--y, -120px))) scale(1.1);
+      }
+    }
+
+    @keyframes burstFade {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
 
     #stage {
       display: none;
       width: 100%;
+      position: relative;
     }
 
     .frame {
@@ -70,7 +130,7 @@
       overflow: hidden;
       position: relative;
       background: #11131a;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
     }
 
     #photo {
@@ -80,9 +140,10 @@
       height: 100%;
       object-fit: cover;
       opacity: 0;
-      transform: scale(1.04);
-      transition: opacity 650ms ease, transform 650ms ease;
-      will-change: transform, opacity;
+      transform: scale(1.06);
+      will-change: opacity, transform, filter;
+      transition: opacity 560ms ease, transform 1200ms ease, filter 560ms ease;
+      filter: saturate(1.04) contrast(1.02);
     }
 
     #photo.show {
@@ -90,17 +151,65 @@
       transform: scale(1);
     }
 
+    #photo.exit {
+      opacity: 0;
+      transform: scale(0.98);
+      filter: blur(1px);
+    }
+
     #qa {
       display: none;
       margin-top: 14px;
+      position: relative;
+      min-height: 260px;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--outline);
+      isolation: isolate;
+    }
+
+    .memory-wall {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 20%, rgba(255, 153, 204, 0.26), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(153, 204, 255, 0.22), transparent 45%),
+        rgba(16, 12, 22, 0.76);
+    }
+
+    .qa-card {
+      position: relative;
+      z-index: 2;
+      padding: 16px 14px 14px;
+      background: linear-gradient(180deg, rgba(8, 7, 14, 0.28), rgba(8, 7, 14, 0.62));
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .me-avatar {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      object-fit: cover;
+      border: 3px solid rgba(255, 255, 255, 0.66);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
     }
 
     #question {
-      margin: 0 0 14px;
-      font-size: clamp(1.5rem, 7vw, 2rem);
-      line-height: 1.1;
-      font-weight: 850;
+      margin: 0 0 12px;
+      font-size: clamp(1.6rem, 7vw, 2.1rem);
+      line-height: 1.08;
+      font-weight: 880;
       letter-spacing: -0.01em;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+    }
+
+    .subtext {
+      margin: 0 0 13px;
+      font-size: 0.96rem;
+      color: rgba(255, 255, 255, 0.86);
     }
 
     .actions {
@@ -112,14 +221,16 @@
 
     .btn {
       border: 0;
-      border-radius: 12px;
+      border-radius: 14px;
       min-width: 120px;
       padding: 12px 20px;
       color: #fff;
       font-size: 1rem;
       font-weight: 730;
       -webkit-tap-highlight-color: transparent;
-      transition: transform 180ms ease, background-color 220ms ease;
+      transition: transform 180ms ease, background-color 220ms ease, filter 220ms ease;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+      cursor: pointer;
     }
 
     .btn:active { transform: scale(0.97); }
@@ -142,29 +253,45 @@
       margin-top: 12px;
       font-size: 1.02rem;
       font-weight: 650;
-      color: rgba(255, 255, 255, 0.93);
+      color: rgba(255, 255, 255, 0.96);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    #fxCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 30;
     }
   </style>
 </head>
 <body>
   <main class="app">
-    <button id="startBtn">Hardik wants you to click here</button>
+    <button id="startBtn">Open your Valentine surprise</button>
+    <div id="introBurst" class="intro-burst" aria-hidden="true"></div>
 
     <section id="stage" aria-live="polite">
       <div class="frame">
-        <img id="photo" alt="memory" />
+        <img id="photo" alt="memory" loading="eager" decoding="async" />
       </div>
 
       <div id="qa">
-        <h1 id="question">Will you be my Valentine?</h1>
-        <div class="actions">
-          <button id="yesBtn" class="btn">Yes</button>
-          <button id="noBtn" class="btn">No</button>
+        <div class="memory-wall" id="memoryWall"></div>
+        <div class="qa-card">
+          <img id="meAvatar" class="me-avatar" alt="Hardik" />
+          <h1 id="question">Will you be my Valentine?</h1>
+          <p class="subtext">I made this with our favorite memories 💗</p>
+          <div class="actions">
+            <button id="yesBtn" class="btn">Yes</button>
+            <button id="noBtn" class="btn">No</button>
+          </div>
+          <div id="message"></div>
         </div>
-        <div id="message"></div>
       </div>
     </section>
   </main>
+
+  <canvas id="fxCanvas" aria-hidden="true"></canvas>
 
   <script>
     const sequence = ["pic1.jpg", "pic2.jpg", "pic3.jpg", "pic4.jpg", "pic5.jpg"];
@@ -177,42 +304,183 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const message = document.getElementById("message");
+    const memoryWall = document.getElementById("memoryWall");
+    const meAvatar = document.getElementById("meAvatar");
+    const introBurst = document.getElementById("introBurst");
+    const fxCanvas = document.getElementById("fxCanvas");
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const optimizedCache = new Map();
 
-    function preload(list) {
-      return Promise.all(
-        list.map((src) =>
-          new Promise((resolve) => {
-            const img = new Image();
-            img.onload = resolve;
-            img.onerror = resolve;
-            img.src = src;
-          })
-        )
-      );
+    async function optimizeImage(src, options = {}) {
+      const cacheKey = `${src}:${options.maxSide || 760}:${options.quality || 0.33}`;
+      if (optimizedCache.has(cacheKey)) return optimizedCache.get(cacheKey);
+
+      const task = new Promise((resolve) => {
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = () => {
+          try {
+            const maxSide = options.maxSide || 760;
+            const ratio = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(img.naturalWidth * ratio));
+            canvas.height = Math.max(1, Math.round(img.naturalHeight * ratio));
+
+            const ctx = canvas.getContext("2d", { alpha: false });
+            if (!ctx) return resolve(src);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+              if (!blob) return resolve(src);
+              resolve(URL.createObjectURL(blob));
+            }, "image/jpeg", options.quality || 0.33);
+          } catch {
+            resolve(src);
+          }
+        };
+        img.onerror = () => resolve(src);
+        img.src = src;
+      });
+
+      optimizedCache.set(cacheKey, task);
+      return task;
+    }
+
+    function warmupImages(list) {
+      list.forEach((src) => {
+        optimizeImage(src);
+      });
+    }
+
+    async function safeOptimizedSource(src, timeoutMs = 1800) {
+      return Promise.race([
+        optimizeImage(src),
+        new Promise((resolve) => setTimeout(() => resolve(null), timeoutMs))
+      ]);
     }
 
     async function show(src, holdMs) {
+      photo.classList.add("exit");
       photo.classList.remove("show");
-      await sleep(90);
-      photo.src = src;
+      await sleep(210);
+
+      const optimized = await safeOptimizedSource(src, src === "pic3.jpg" ? 1100 : 2000);
+      if (!optimized) return;
+
+      photo.src = optimized;
+      photo.classList.remove("exit");
       photo.classList.add("show");
       await sleep(holdMs);
     }
 
+    function playIntroBurst() {
+      introBurst.innerHTML = "";
+      const symbols = ["💗", "💖", "✨", "💕", "💞", "🌸"];
+      for (let i = 0; i < 18; i += 1) {
+        const span = document.createElement("span");
+        span.className = "heart";
+        span.textContent = symbols[i % symbols.length];
+        span.style.setProperty("--x", `${(Math.random() - 0.5) * 280}px`);
+        span.style.setProperty("--y", `${-70 - Math.random() * 220}px`);
+        span.style.animationDelay = `${Math.random() * 160}ms`;
+        introBurst.appendChild(span);
+      }
+      introBurst.classList.remove("show");
+      void introBurst.offsetWidth;
+      introBurst.classList.add("show");
+    }
+
+    async function decorateQuestionPanel() {
+      const [memA, memB, avatar] = await Promise.all([
+        optimizeImage(sequence[1], { maxSide: 620, quality: 0.28 }),
+        optimizeImage(sequence[3], { maxSide: 620, quality: 0.28 }),
+        optimizeImage(finalImage, { maxSide: 500, quality: 0.4 })
+      ]);
+
+      memoryWall.style.backgroundImage =
+        `radial-gradient(circle at 10% 20%, rgba(255, 153, 204, 0.26), transparent 45%),` +
+        `radial-gradient(circle at 80% 0%, rgba(153, 204, 255, 0.22), transparent 45%),` +
+        `url('${memA}'), url('${memB}')`;
+      memoryWall.style.backgroundSize = "auto, auto, cover, cover";
+      memoryWall.style.backgroundPosition = "center, center, center, center";
+      memoryWall.style.backgroundBlendMode = "normal, normal, soft-light, screen";
+
+      meAvatar.src = avatar;
+    }
+
+    function confettiYes() {
+      const ctx = fxCanvas.getContext("2d");
+      if (!ctx) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      fxCanvas.width = Math.floor(width * dpr);
+      fxCanvas.height = Math.floor(height * dpr);
+      fxCanvas.style.width = `${width}px`;
+      fxCanvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const colors = ["#ff4f92", "#ffd166", "#7ef2ff", "#9bffb0", "#ffffff"];
+      const pieces = Array.from({ length: 150 }, () => ({
+        x: Math.random() * width,
+        y: -10 - Math.random() * height * 0.4,
+        size: 4 + Math.random() * 8,
+        vy: 2 + Math.random() * 4,
+        vx: -1.5 + Math.random() * 3,
+        rot: Math.random() * Math.PI,
+        vr: -0.2 + Math.random() * 0.4,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      }));
+
+      const start = performance.now();
+      const duration = 2200;
+
+      function tick(now) {
+        const elapsed = now - start;
+        ctx.clearRect(0, 0, width, height);
+
+        pieces.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.72);
+          ctx.restore();
+        });
+
+        if (elapsed < duration) {
+          requestAnimationFrame(tick);
+        } else {
+          ctx.clearRect(0, 0, width, height);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
     async function startFlow() {
       startBtn.disabled = true;
-      await preload([...sequence, finalImage]);
+      playIntroBurst();
 
+      await safeOptimizedSource(sequence[0], 1300);
+      warmupImages([...sequence.slice(1), finalImage]);
+
+      await sleep(260);
       startBtn.style.display = "none";
       stage.style.display = "block";
 
       for (const src of sequence) {
-        await show(src, 1050);
+        await show(src, 920);
       }
 
-      await show(finalImage, 380);
+      await show(finalImage, 440);
+      await decorateQuestionPanel();
       qa.style.display = "block";
     }
 
@@ -220,6 +488,8 @@
       message.textContent = "aw, thanks to my fav person in the whole world!";
       yesBtn.disabled = true;
       noBtn.disabled = true;
+      yesBtn.style.filter = "brightness(1.06)";
+      confettiYes();
     }
 
     function onNo() {
