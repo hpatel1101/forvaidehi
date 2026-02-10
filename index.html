@@ -31,6 +31,7 @@
       display: grid;
       place-items: center;
       padding: 18px;
+      overflow-x: hidden;
     }
 
     .app {
@@ -41,7 +42,7 @@
 
     #startBtn {
       width: 100%;
-      min-height: 96px;
+      min-height: 108px;
       border: 0;
       border-radius: 20px;
       padding: 18px;
@@ -49,15 +50,68 @@
       font-weight: 760;
       letter-spacing: 0.01em;
       color: #fff;
-      background: var(--card);
+      background:
+        radial-gradient(circle at 20% 18%, rgba(255, 171, 204, 0.34), transparent 40%),
+        radial-gradient(circle at 82% 16%, rgba(162, 194, 255, 0.26), transparent 40%),
+        linear-gradient(135deg, rgba(255, 78, 128, 0.36), rgba(111, 66, 193, 0.45));
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1px var(--outline);
       -webkit-tap-highlight-color: transparent;
-      transition: transform 180ms ease;
+      transition: transform 180ms ease, box-shadow 220ms ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
 
+    #startBtn::after {
+      content: "💌 tap to open";
+      display: block;
+      margin-top: 8px;
+      font-size: 0.92rem;
+      font-weight: 620;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    #startBtn:hover { box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
     #startBtn:active { transform: scale(0.98); }
+
+    .intro-burst {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      opacity: 0;
+    }
+
+    .intro-burst.show {
+      opacity: 1;
+      animation: burstFade 900ms ease forwards;
+    }
+
+    .heart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      font-size: 20px;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.2);
+      animation: heartPop 1000ms ease forwards;
+    }
+
+    @keyframes heartPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+      20% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--x, 0px)), calc(-50% + var(--y, -120px))) scale(1.1);
+      }
+    }
+
+    @keyframes burstFade {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
 
     #stage {
       display: none;
@@ -221,7 +275,8 @@
 </head>
 <body>
   <main class="app">
-    <button id="startBtn">Hardik wants you to click here</button>
+    <button id="startBtn">Open your Valentine surprise</button>
+    <div id="introBurst" class="intro-burst" aria-hidden="true"></div>
 
     <section id="stage" aria-live="polite">
       <div class="frame">
@@ -243,6 +298,8 @@
       </div>
     </section>
   </main>
+
+  <canvas id="fxCanvas" aria-hidden="true"></canvas>
 
   <script>
     const sequence = ["pic1.jpg", "pic2.jpg", "pic3.jpg", "pic4.jpg", "pic5.jpg"];
@@ -335,6 +392,7 @@
       startBtn.disabled = true;
       warmupImages([...sequence.slice(1), finalImage]);
 
+      await sleep(260);
       startBtn.style.display = "none";
       stage.style.display = "block";
 
