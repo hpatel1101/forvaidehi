@@ -1,437 +1,136 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Valentine</title>
-  <style>
-    :root {
-      --bg-start: #1f1127;
-      --bg-end: #090a0f;
-      --card: rgba(255, 255, 255, 0.1);
-      --text: #ffffff;
-      --yes: #2ad86f;
-      --no: #ff3b5c;
-      --outline: rgba(255, 255, 255, 0.18);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine?</title>
 
-    * { box-sizing: border-box; }
+<style>
+  body{
+    margin:0;
+    font-family:-apple-system, BlinkMacSystemFont, "Apple Color Emoji","Segoe UI Emoji", sans-serif;
+    background:#ffb6c1;
+    text-align:center;
+    overflow:hidden;
+  }
 
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(1200px 800px at 50% -10%, #492657 0%, transparent 45%),
-        linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 80%);
-    }
+  #startBtn{
+    margin-top:40vh;
+    padding:20px 28px;
+    font-size:22px;
+    border:none;
+    border-radius:16px;
+    background:#ff2e63;
+    color:#fff;
+  }
 
-    body {
-      display: grid;
-      place-items: center;
-      padding: 18px;
-      overflow-x: hidden;
-    }
+  /* BIG, clean photos */
+  .fly{
+    position:absolute;
+    width:260px;              /* <-- BIGGER */
+    max-width:70vw;           /* keeps it nice on small screens */
+    height:auto;
+    border-radius:18px;
+    box-shadow: 0 14px 30px rgba(0,0,0,.22);
+    opacity: 0;
+    transform: translate(0,0) scale(0.98);
+    will-change: transform, opacity;
+    animation: driftAway 3.4s ease-in-out forwards;  /* <-- SLOWER */
+  }
 
-    .app {
-      width: min(440px, 100%);
-      text-align: center;
-      position: relative;
-    }
+  /* No spinning. Gentle fade in, glide, fade out */
+  @keyframes driftAway{
+    0%   { opacity:0; transform: translate(0,0) scale(0.98); }
+    12%  { opacity:1; transform: translate(0,0) scale(1.00); }
+    85%  { opacity:1; transform: translate(var(--x), var(--y)) scale(1.00); }
+    100% { opacity:0; transform: translate(var(--x), var(--y)) scale(0.98); }
+  }
 
-    #startBtn {
-      width: 100%;
-      min-height: 108px;
-      border: 0;
-      border-radius: 20px;
-      padding: 18px;
-      font-size: clamp(1.2rem, 4.7vw, 1.5rem);
-      font-weight: 760;
-      letter-spacing: 0.01em;
-      color: #fff;
-      background:
-        radial-gradient(circle at 20% 18%, rgba(255, 171, 204, 0.34), transparent 40%),
-        radial-gradient(circle at 82% 16%, rgba(162, 194, 255, 0.26), transparent 40%),
-        linear-gradient(135deg, rgba(255, 78, 128, 0.36), rgba(111, 66, 193, 0.45));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1px var(--outline);
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 180ms ease, box-shadow 220ms ease;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
+  #question{
+    display:none;
+    margin-top:26vh;
+    padding: 0 18px;
+  }
 
-    #startBtn::after {
-      content: "💌 tap to open";
-      display: block;
-      margin-top: 8px;
-      font-size: 0.92rem;
-      font-weight: 620;
-      color: rgba(255, 255, 255, 0.86);
-    }
+  h1{
+    margin:0;
+    font-size:38px;
+    color:#1a1a1a;
+    text-shadow: 0 2px 0 rgba(255,255,255,.25);
+  }
 
-    #startBtn:hover { box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
-    #startBtn:active { transform: scale(0.98); }
-
-    .intro-burst {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 8;
-      opacity: 0;
-    }
-
-    .intro-burst.show {
-      opacity: 1;
-      animation: burstFade 900ms ease forwards;
-    }
-
-    .heart {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      font-size: 20px;
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.2);
-      animation: heartPop 1000ms ease forwards;
-    }
-
-    @keyframes heartPop {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
-      20% { opacity: 1; }
-      100% {
-        opacity: 0;
-        transform: translate(calc(-50% + var(--x, 0px)), calc(-50% + var(--y, -120px))) scale(1.1);
-      }
-    }
-
-    @keyframes burstFade {
-      0% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-
-    #stage {
-      display: none;
-      width: 100%;
-      position: relative;
-    }
-
-    .frame {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 4 / 5;
-      border-radius: 24px;
-      overflow: hidden;
-      position: relative;
-      background: #11131a;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-    }
-
-    .slide {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transform: scale(1.06);
-      will-change: opacity, transform, filter;
-      transition: opacity 520ms ease, transform 1100ms ease, filter 520ms ease;
-      filter: saturate(1.04) contrast(1.02);
-    }
-
-    .slide.show {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    #photo.exit {
-      opacity: 0;
-      transform: scale(0.98);
-      filter: blur(1px);
-    }
-
-    #qa {
-      display: none;
-      position: relative;
-      margin-top: 14px;
-      position: relative;
-      min-height: 260px;
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.45);
-      border: 1px solid var(--outline);
-      isolation: isolate;
-    }
-
-    .memory-wall {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(circle at 10% 20%, rgba(255, 153, 204, 0.26), transparent 45%),
-        radial-gradient(circle at 80% 0%, rgba(153, 204, 255, 0.22), transparent 45%),
-        rgba(16, 12, 22, 0.76);
-    }
-
-    .memory-wall::before,
-    .memory-wall::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      mix-blend-mode: screen;
-      opacity: 0.22;
-      filter: blur(14px) saturate(1.2);
-      transform: scale(1.08);
-    }
-
-    .memory-wall::after {
-      opacity: 0.16;
-      filter: blur(24px);
-      transform: scale(1.15);
-    }
-
-    .qa-card {
-      position: relative;
-      z-index: 2;
-      padding: 16px 14px 14px;
-      background: linear-gradient(180deg, rgba(8, 7, 14, 0.28), rgba(8, 7, 14, 0.62));
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-    }
-
-    .me-avatar {
-      width: 92px;
-      height: 92px;
-      border-radius: 50%;
-      margin: 0 auto 10px;
-      object-fit: cover;
-      border: 3px solid rgba(255, 255, 255, 0.66);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
-    }
-
-    #question {
-      margin: 0 0 12px;
-      font-size: clamp(1.6rem, 7vw, 2.1rem);
-      line-height: 1.08;
-      font-weight: 880;
-      letter-spacing: -0.01em;
-      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
-    }
-
-    .subtext {
-      margin: 0 0 13px;
-      font-size: 0.96rem;
-      color: rgba(255, 255, 255, 0.86);
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 14px;
-      min-width: 120px;
-      padding: 12px 20px;
-      font-size: 1rem;
-      font-weight: 730;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform 180ms ease, background-color 220ms ease, filter 220ms ease;
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
-    }
-
-    .btn:active { transform: scale(0.96); }
-    #yesBtn { background: var(--yes); }
-    #noBtn { background: var(--no); }
-
-    #noBtn.switching {
-      animation: switchy 420ms ease;
-      background: var(--yes);
-    }
-
-    @keyframes switchy {
-      0% { transform: rotate(0deg) scale(1); }
-      40% { transform: rotate(-8deg) scale(0.9); }
-      100% { transform: rotate(0deg) scale(1); }
-    }
-
-    #message {
-      margin-top: 12px;
-      min-height: 26px;
-      font-weight: 650;
-      color: rgba(255, 255, 255, 0.96);
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-    }
-  </style>
+  #me{
+    width:240px;
+    border-radius:22px;
+    margin-top:18px;
+    box-shadow: 0 14px 30px rgba(0,0,0,.22);
+  }
+</style>
 </head>
+
 <body>
-  <div class="spark-bg" id="sparkBg" aria-hidden="true"></div>
 
-  <main class="app">
-    <button id="startBtn">Open your Valentine surprise</button>
-    <div id="introBurst" class="intro-burst" aria-hidden="true"></div>
+<button id="startBtn">Hardik wants you to click here ❤️</button>
 
-    <section id="stage" aria-live="polite">
-      <div class="frame">
-        <img id="photo" alt="memory" loading="eager" decoding="async" />
-      </div>
+<div id="question">
+  <h1>Will you be my Valentine? 💘</h1>
+  <img id="me" src="me.jpg" alt="me">
+</div>
 
-      <div id="qa">
-        <div class="memory-wall" id="memoryWall"></div>
-        <div class="qa-card">
-          <img id="meAvatar" class="me-avatar" alt="Hardik" />
-          <h1 id="question">Will you be my Valentine?</h1>
-          <p class="subtext">I made this with our favorite memories 💗</p>
-          <div class="actions">
-            <button id="yesBtn" class="btn">Yes</button>
-            <button id="noBtn" class="btn">No</button>
-          </div>
-          <div id="message"></div>
-        </div>
-      </div>
-    </section>
-  </main>
+<script>
+/* Tune these if you want:
+   - BIGGER images: increase IMG_WIDTH
+   - SLOWER: increase DURATION_MS and GAP_MS
+*/
+const TOTAL = 10;        // how many photos float by
+const GAP_MS = 600;      // time between each photo (bigger = slower sequence)
+const DURATION_MS = 3400;
 
-  <canvas id="fxCanvas" aria-hidden="true"></canvas>
+document.getElementById("startBtn").addEventListener("click", start, { once:true });
 
-  <script>
-    const sequence = ["pic1.jpg", "pic2.jpg", "pic3.jpg", "pic4.jpg", "pic5.jpg"];
-    const finalImage = "me.jpg";
+function start(){
+  document.getElementById("startBtn").style.display = "none";
 
-    const startWrap = document.getElementById("startWrap");
-    const startBtn = document.getElementById("startBtn");
-    const stage = document.getElementById("stage");
-    const slideA = document.getElementById("slideA");
-    const slideB = document.getElementById("slideB");
-    const vdayBurst = document.getElementById("vdayBurst");
-    const qa = document.getElementById("qa");
-    const qaBg = document.getElementById("qaBg");
-    const meAvatar = document.getElementById("meAvatar");
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn = document.getElementById("noBtn");
-    const message = document.getElementById("message");
-    const memoryWall = document.getElementById("memoryWall");
-    const meAvatar = document.getElementById("meAvatar");
-
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    const optimizedCache = new Map();
-
-    async function optimizeImage(src) {
-      if (optimizedCache.has(src)) return optimizedCache.get(src);
-
-      const task = new Promise((resolve) => {
-        const img = new Image();
-        img.decoding = "async";
-        img.onload = () => {
-          try {
-            const maxSide = 900;
-            const ratio = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-            const canvas = document.createElement("canvas");
-            canvas.width = Math.max(1, Math.round(img.naturalWidth * ratio));
-            canvas.height = Math.max(1, Math.round(img.naturalHeight * ratio));
-
-            const ctx = canvas.getContext("2d", { alpha: false });
-            if (!ctx) return resolve(src);
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            canvas.toBlob((blob) => {
-              if (!blob) return resolve(src);
-              resolve(URL.createObjectURL(blob));
-            }, "image/jpeg", 0.45);
-          } catch {
-            resolve(src);
-          }
-        };
-        img.onerror = () => resolve(src);
-        img.src = src;
-      });
-
-      optimizedCache.set(src, task);
-      return task;
-    }
-
-    function warmupImages(list) {
-      list.forEach((src) => {
-        optimizeImage(src);
-      });
-    }
-
-    async function show(src, holdMs) {
-      photo.classList.add("exit");
-      photo.classList.remove("show");
-      await sleep(210);
-      photo.src = await optimizeImage(src);
-      photo.classList.remove("exit");
-      photo.classList.add("show");
-      await sleep(holdMs);
-    }
-
-    async function decorateQuestionPanel() {
-      const [memA, memB, avatar] = await Promise.all([
-        optimizeImage(sequence[1]),
-        optimizeImage(sequence[3]),
-        optimizeImage(finalImage)
-      ]);
-
-      memoryWall.style.setProperty("--bg-a", `url('${memA}')`);
-      memoryWall.style.setProperty("--bg-b", `url('${memB}')`);
-      memoryWall.style.backgroundImage =
-        `radial-gradient(circle at 10% 20%, rgba(255, 153, 204, 0.26), transparent 45%),` +
-        `radial-gradient(circle at 80% 0%, rgba(153, 204, 255, 0.22), transparent 45%),` +
-        `url('${memA}'), url('${memB}')`;
-      memoryWall.style.backgroundSize = "auto, auto, cover, cover";
-      memoryWall.style.backgroundPosition = "center, center, center, center";
-      memoryWall.style.backgroundBlendMode = "normal, normal, soft-light, screen";
-
-      meAvatar.src = avatar;
-    }
-
-    async function startFlow() {
-      startBtn.disabled = true;
-      warmupImages([...sequence.slice(1), finalImage]);
-
-      await sleep(260);
-      startBtn.style.display = "none";
-      stage.style.display = "block";
-
-      for (const src of sequence) {
-        await show(src, 860);
-      }
-
-      await show(finalImage, 420);
-      await decorateQuestionPanel();
-      qa.style.display = "block";
-    }
-
-    function onYes() {
-      message.textContent = "aw, thanks to my fav person in the whole world!";
-      yesBtn.disabled = true;
-      noBtn.disabled = true;
-      yesBtn.style.filter = "brightness(1.06)";
-    }
-
-    function onNo() {
-      noBtn.disabled = true;
-      noBtn.classList.add("switching");
-      noBtn.textContent = "Yes";
-      message.textContent = "ur stuck with a yes only";
+  let i = 0;
+  const timer = setInterval(() => {
+    spawnOne(i);
+    i++;
+    if (i >= TOTAL) {
+      clearInterval(timer);
+      // show question after the last photo has had a moment
       setTimeout(() => {
-        yesBtn.disabled = true;
-      }, 120);
+        document.getElementById("question").style.display = "block";
+      }, 900);
     }
+  }, GAP_MS);
+}
 
-    startAmbientSparks();
-    startBtn.addEventListener("click", startFlow);
-    yesBtn.addEventListener("click", onYes);
-    noBtn.addEventListener("click", onNo);
-  </script>
+function spawnOne(i){
+  const img = document.createElement("img");
+  img.src = "pic" + ((i % 5) + 1) + ".jpg";
+  img.className = "fly";
+
+  // Start near center so you can SEE it clearly
+  const startX = window.innerWidth * 0.5;
+  const startY = window.innerHeight * 0.48;
+
+  // Center the image around start point
+  img.style.left = (startX - 130) + "px";  // 130 = half of 260px width
+  img.style.top  = (startY - 90) + "px";
+
+  // Gentle outward drift (not insane distances)
+  const driftX = (Math.random() * 520 - 260);   // -260 to +260
+  const driftY = (Math.random() * 520 - 260);
+
+  img.style.setProperty("--x", driftX + "px");
+  img.style.setProperty("--y", driftY + "px");
+
+  document.body.appendChild(img);
+
+  // Cleanup
+  setTimeout(() => img.remove(), DURATION_MS + 100);
+}
+</script>
+
 </body>
 </html>
