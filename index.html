@@ -6,219 +6,210 @@
 <title>💘</title>
 
 <style>
-  :root{
-    --bg1:#ff6aa2;
-    --bg2:#ffd1dc;
-    --card:#ffffffcc;
-    --text:#1b1b1b;
-    --accent:#ff2e63;
-  }
-
-  html,body{height:100%;}
+  html,body{height:100%}
   body{
     margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;
-    background: radial-gradient(1200px 800px at 20% 20%, #fff 0%, var(--bg2) 35%, var(--bg1) 100%);
-    color:var(--text);
-    overflow:hidden;
-  }
-
-  .wrap{
-    position:relative;
-    height:100%;
+    font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    background:#fff;
     display:grid;
     place-items:center;
-    padding:24px;
   }
 
-  .card{
-    width:min(440px, 92vw);
-    background:var(--card);
-    backdrop-filter: blur(10px);
-    border:1px solid #ffffff80;
-    border-radius:28px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.18);
-    padding:22px 18px 18px;
+  .container{
+    width:min(520px, 92vw);
     text-align:center;
+    padding:22px;
   }
 
-  .title{
-    font-size:22px;
-    font-weight:800;
-    letter-spacing:.2px;
-    margin:6px 0 14px;
-  }
-
-  .sub{
-    font-size:14px;
-    opacity:.75;
-    margin:0 0 18px;
-  }
-
-  button{
-    appearance:none;
+  .btnStart{
     border:none;
-    border-radius:18px;
-    background:linear-gradient(135deg, var(--accent), #ff7aa2);
-    color:white;
-    font-weight:800;
+    background:#111;
+    color:#fff;
+    font-weight:700;
     font-size:18px;
-    padding:16px 18px;
-    width:100%;
-    box-shadow:0 10px 30px rgba(255,46,99,.35);
-    transform:translateZ(0);
+    padding:14px 18px;
+    border-radius:14px;
   }
-  button:active{ transform: scale(.98) translateZ(0); }
+  .btnStart:active{ transform:scale(.98); }
 
-  .question{
-    display:none;
-    margin-top:14px;
+  .frame{
+    margin:18px auto 0;
+    width:min(420px, 90vw);
+    aspect-ratio: 4 / 5;
+    border-radius:22px;
+    overflow:hidden;
+    background:#f3f3f3;
+    box-shadow:0 18px 50px rgba(0,0,0,.12);
+    position:relative;
   }
-  .question h1{
-    margin:12px 0 10px;
-    font-size:28px;
+
+  .photo{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:0;
+    transform:scale(1.02);
+    transition: opacity 900ms ease, transform 1200ms ease;
+  }
+  .photo.show{
+    opacity:1;
+    transform:scale(1);
+  }
+  .photo.fadeOut{
+    opacity:0;
+    transform:scale(1.02);
+  }
+
+  .final{
+    display:none;
+    margin-top:18px;
+  }
+  .question{
+    margin:18px 0 14px;
+    font-size:34px;
     line-height:1.1;
+    font-weight:800;
+    letter-spacing:-.4px;
+    color:#111;
   }
 
   .me{
-    width:220px;
-    max-width:70%;
-    border-radius:24px;
-    border:2px solid #fff;
-    box-shadow:0 12px 30px rgba(0,0,0,.18);
+    width:min(320px, 80vw);
+    border-radius:22px;
+    box-shadow:0 18px 50px rgba(0,0,0,.12);
+    margin:10px auto 18px;
+    display:block;
   }
 
-  /* flying photos layer */
-  .layer{
-    position:absolute;
-    inset:0;
-    pointer-events:none;
+  .row{
+    display:flex;
+    gap:12px;
+    justify-content:center;
   }
-  .fly{
-    position:absolute;
-    width:84px;
-    height:84px;
-    object-fit:cover;
-    border-radius:18px;
-    box-shadow:0 10px 24px rgba(0,0,0,.20);
-    will-change: transform, opacity;
-    transform: translate3d(0,0,0);
-  }
-
-  /* tiny hearts in background (nice touch, low cost) */
-  .heart{
-    position:absolute;
+  .choice{
+    border:none;
+    border-radius:14px;
+    padding:14px 18px;
     font-size:18px;
-    opacity:.22;
-    animation: floatUp 6s linear infinite;
+    font-weight:800;
+    min-width:120px;
   }
-  @keyframes floatUp{
-    from{ transform: translate3d(0, 20px, 0); }
-    to{ transform: translate3d(0, -120vh, 0); }
+  .yes{ background:#16a34a; color:#fff; }
+  .no{ background:#ef4444; color:#fff; }
+
+  .result{
+    margin-top:14px;
+    font-size:18px;
+    font-weight:700;
+    color:#111;
+    min-height:24px;
+  }
+
+  .hint{
+    margin-top:10px;
+    font-size:13px;
+    color:#666;
   }
 </style>
 </head>
 
 <body>
-<div class="wrap">
-  <div class="layer" id="layer"></div>
+  <div class="container">
+    <button id="start" class="btnStart">Hardik wants you to click here 💘</button>
+    <div class="hint" id="hint">make sure your images are named pic1.jpg … pic5.jpg and me.jpg</div>
 
-  <div class="card">
-    <div class="title">A message for you 💌</div>
-    <p class="sub">Tap the button. Don’t overthink it 🙂</p>
+    <div class="frame" id="frame" aria-label="slideshow frame">
+      <img id="img" class="photo" alt="memory">
+    </div>
 
-    <button id="startBtn">Hardik wants you to click here ❤️</button>
+    <div class="final" id="final">
+      <div class="question">Will you be my Valentine?</div>
+      <img class="me" src="me.jpg" alt="Hardik">
 
-    <div class="question" id="question">
-      <h1>Will you be my Valentine? 💘</h1>
-      <img class="me" src="me.jpg" alt="me">
+      <div class="row">
+        <button id="yesBtn" class="choice yes">Yes</button>
+        <button id="noBtn" class="choice no">No</button>
+      </div>
+
+      <div class="result" id="result"></div>
     </div>
   </div>
-</div>
 
 <script>
-  // Put your 5 pics here (must exist in same folder):
   const pics = ["pic1.jpg","pic2.jpg","pic3.jpg","pic4.jpg","pic5.jpg"];
+  const img = document.getElementById("img");
+  const startBtn = document.getElementById("start");
+  const hint = document.getElementById("hint");
+  const final = document.getElementById("final");
+  const result = document.getElementById("result");
 
-  // Lightweight background hearts
-  const layer = document.getElementById("layer");
-  for(let i=0;i<14;i++){
-    const h=document.createElement("div");
-    h.className="heart";
-    h.textContent = Math.random()>.5 ? "💗" : "💖";
-    h.style.left = (Math.random()*100)+"vw";
-    h.style.top = (60 + Math.random()*60)+"vh";
-    h.style.animationDelay = (-Math.random()*6)+"s";
-    h.style.fontSize = (14 + Math.random()*16)+"px";
-    layer.appendChild(h);
-  }
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn  = document.getElementById("noBtn");
 
-  // Preload images to prevent “glitchy” first-run
+  // timings (ms): fade in/out + pause
+  const fadeIn  = 900;
+  const hold    = 1200;
+  const fadeOut = 900;
+
   function preload(list){
     return Promise.all(list.map(src => new Promise(res=>{
-      const im=new Image();
-      im.onload=()=>res(true);
-      im.onerror=()=>res(true);
-      im.src=src;
+      const im = new Image();
+      im.onload = () => res(true);
+      im.onerror = () => res(true);
+      im.src = src;
     })));
   }
 
-  function burst(){
-    const W = window.innerWidth;
-    const H = window.innerHeight;
+  function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
-    // fewer elements = smoother on iPhone
-    const count = 12;
+  async function play(){
+    startBtn.disabled = true;
+    startBtn.textContent = "Loading…";
+    hint.style.display = "none";
 
-    for(let i=0;i<count;i++){
-      const img=document.createElement("img");
-      img.className="fly";
-      img.src = pics[i % pics.length];
-
-      // start near the button/card center
-      const startX = W/2 + (Math.random()*40 - 20);
-      const startY = H/2 + (Math.random()*40 - 20);
-
-      img.style.left = (startX - 42) + "px";
-      img.style.top  = (startY - 42) + "px";
-      layer.appendChild(img);
-
-      // send outward
-      const angle = Math.random()*Math.PI*2;
-      const dist  = 420 + Math.random()*520;
-      const endX  = Math.cos(angle)*dist;
-      const endY  = Math.sin(angle)*dist;
-
-      const rot = (Math.random()*900 - 450);
-
-      img.animate([
-        { transform:`translate3d(0,0,0) rotate(0deg) scale(1)`, opacity: 1 },
-        { transform:`translate3d(${endX}px,${endY}px,0) rotate(${rot}deg) scale(.85)`, opacity: 0 }
-      ],{
-        duration: 750,
-        easing: "cubic-bezier(.2,.9,.2,1)",
-        fill: "forwards",
-        delay: i*18
-      });
-
-      // clean up after animation
-      setTimeout(()=> img.remove(), 1200);
-    }
-  }
-
-  const btn = document.getElementById("startBtn");
-  btn.addEventListener("click", async () => {
-    btn.disabled = true;
-    btn.textContent = "Loading… 💞";
-
-    // preload burst photos + me.jpg
     await preload([...pics, "me.jpg"]);
 
-    btn.style.display = "none";
-    burst();
-    setTimeout(()=> {
-      document.getElementById("question").style.display="block";
-    }, 900);
+    startBtn.style.display = "none";
+
+    for(const src of pics){
+      img.src = src;
+
+      // fade in
+      img.classList.remove("fadeOut");
+      await sleep(40);
+      img.classList.add("show");
+      await sleep(fadeIn + hold);
+
+      // fade out
+      img.classList.add("fadeOut");
+      img.classList.remove("show");
+      await sleep(fadeOut);
+    }
+
+    // final screen
+    final.style.display = "block";
+  }
+
+  startBtn.addEventListener("click", play);
+
+  function accept(){
+    result.textContent = "Yay 💘 See you on Valentine’s 🙂";
+    // optionally disable after
+    yesBtn.disabled = true;
+    noBtn.disabled = true;
+    noBtn.textContent = "Yes";
+    noBtn.className = "choice yes";
+  }
+
+  yesBtn.addEventListener("click", accept);
+
+  // “No” becomes “Yes”
+  noBtn.addEventListener("click", () => {
+    noBtn.textContent = "Yes";
+    noBtn.className = "choice yes";
+    accept();
   });
 </script>
 </body>
