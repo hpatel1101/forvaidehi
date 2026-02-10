@@ -6,14 +6,13 @@
   <title>Valentine</title>
   <style>
     :root {
-      --bg-1: #2d1140;
-      --bg-2: #130a1f;
-      --bg-3: #431844;
-      --glass: rgba(255, 255, 255, 0.12);
-      --line: rgba(255, 255, 255, 0.2);
-      --text: #fff;
-      --yes: #2edb78;
-      --no: #ff4569;
+      --bg-start: #1f1127;
+      --bg-end: #090a0f;
+      --card: rgba(255, 255, 255, 0.1);
+      --text: #ffffff;
+      --yes: #2ad86f;
+      --no: #ff3b5c;
+      --outline: rgba(255, 255, 255, 0.18);
     }
 
     * { box-sizing: border-box; }
@@ -23,15 +22,9 @@
       min-height: 100%;
       font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: var(--text);
-      background: linear-gradient(140deg, var(--bg-1), var(--bg-2), var(--bg-3));
-      background-size: 200% 200%;
-      animation: bgShift 10s ease infinite;
-    }
-
-    @keyframes bgShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      background:
+        radial-gradient(1200px 800px at 50% -10%, #492657 0%, transparent 45%),
+        linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 80%);
     }
 
     body {
@@ -42,93 +35,88 @@
     }
 
     .app {
-      width: min(460px, 100%);
+      width: min(440px, 100%);
+      text-align: center;
       position: relative;
-      z-index: 2;
-    }
-
-    .spark-bg {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 1;
-    }
-
-    .spark {
-      position: absolute;
-      bottom: -20px;
-      font-size: 16px;
-      opacity: 0;
-      animation: driftUp linear infinite;
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25));
-    }
-
-    @keyframes driftUp {
-      0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
-      12% { opacity: 0.9; }
-      100% { transform: translateY(-110vh) translateX(var(--dx)) scale(1.2); opacity: 0; }
-    }
-
-    .start-wrap {
-      background: var(--glass);
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      padding: 18px;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-      animation: introIn 680ms ease;
-    }
-
-    @keyframes introIn {
-      from { opacity: 0; transform: translateY(16px) scale(0.96); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     #startBtn {
       width: 100%;
-      min-height: 102px;
+      min-height: 108px;
       border: 0;
       border-radius: 20px;
-      color: #fff;
-      font-size: clamp(1.15rem, 4.8vw, 1.45rem);
-      font-weight: 800;
+      padding: 18px;
+      font-size: clamp(1.2rem, 4.7vw, 1.5rem);
+      font-weight: 760;
       letter-spacing: 0.01em;
+      color: #fff;
       background:
-        radial-gradient(circle at 22% 20%, rgba(255, 205, 230, 0.48), transparent 38%),
-        radial-gradient(circle at 78% 22%, rgba(199, 218, 255, 0.34), transparent 40%),
-        linear-gradient(135deg, rgba(255, 82, 146, 0.5), rgba(117, 74, 211, 0.55));
-      box-shadow:
-        0 16px 34px rgba(0, 0, 0, 0.33),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.26);
-      cursor: pointer;
+        radial-gradient(circle at 20% 18%, rgba(255, 171, 204, 0.34), transparent 40%),
+        radial-gradient(circle at 82% 16%, rgba(162, 194, 255, 0.26), transparent 40%),
+        linear-gradient(135deg, rgba(255, 78, 128, 0.36), rgba(111, 66, 193, 0.45));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1px var(--outline);
+      -webkit-tap-highlight-color: transparent;
       transition: transform 180ms ease, box-shadow 220ms ease;
-      animation: pulseGlow 2.1s ease-in-out infinite;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
 
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 16px 34px rgba(0, 0, 0, 0.33), inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
-      50% { box-shadow: 0 18px 42px rgba(255, 64, 132, 0.33), inset 0 0 0 1px rgba(255, 255, 255, 0.3); }
+    #startBtn::after {
+      content: "💌 tap to open";
+      display: block;
+      margin-top: 8px;
+      font-size: 0.92rem;
+      font-weight: 620;
+      color: rgba(255, 255, 255, 0.86);
     }
 
+    #startBtn:hover { box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.26); }
     #startBtn:active { transform: scale(0.98); }
 
-    .helper {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 0.93rem;
-      color: rgba(255,255,255,0.88);
+    .intro-burst {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 8;
+      opacity: 0;
+    }
+
+    .intro-burst.show {
+      opacity: 1;
+      animation: burstFade 900ms ease forwards;
+    }
+
+    .heart {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      font-size: 20px;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.2);
+      animation: heartPop 1000ms ease forwards;
+    }
+
+    @keyframes heartPop {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+      20% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--x, 0px)), calc(-50% + var(--y, -120px))) scale(1.1);
+      }
+    }
+
+    @keyframes burstFade {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
     }
 
     #stage {
       display: none;
-      animation: stageIn 650ms ease;
-    }
-
-    @keyframes stageIn {
-      from { opacity: 0; transform: translateY(12px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      width: 100%;
+      position: relative;
     }
 
     .frame {
@@ -137,10 +125,9 @@
       aspect-ratio: 4 / 5;
       border-radius: 24px;
       overflow: hidden;
-      background: #0f1018;
-      box-shadow: 0 20px 52px rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.13);
-      margin-top: 12px;
+      position: relative;
+      background: #11131a;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
     }
 
     .slide {
@@ -150,8 +137,10 @@
       height: 100%;
       object-fit: cover;
       opacity: 0;
-      transform: scale(1.04);
-      transition: opacity 700ms ease, transform 1100ms ease;
+      transform: scale(1.06);
+      will-change: opacity, transform, filter;
+      transition: opacity 520ms ease, transform 1100ms ease, filter 520ms ease;
+      filter: saturate(1.04) contrast(1.02);
     }
 
     .slide.show {
@@ -159,101 +148,85 @@
       transform: scale(1);
     }
 
-    .vday-burst {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 4;
+    #photo.exit {
       opacity: 0;
-    }
-
-    .vday-burst.show { animation: burst 900ms ease; }
-
-    @keyframes burst {
-      0% { opacity: 0; transform: scale(0.95); }
-      25% { opacity: 1; }
-      100% { opacity: 0; transform: scale(1.08); }
-    }
-
-    .burst-item {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 22px;
-      animation: popAway 900ms ease forwards;
-    }
-
-    @keyframes popAway {
-      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
-      20% { opacity: 1; }
-      100% {
-        opacity: 0;
-        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1.2);
-      }
+      transform: scale(0.98);
+      filter: blur(1px);
     }
 
     #qa {
       display: none;
       position: relative;
       margin-top: 14px;
-      border-radius: 24px;
+      position: relative;
+      min-height: 260px;
+      border-radius: 22px;
       overflow: hidden;
-      border: 1px solid var(--line);
-      box-shadow: 0 20px 52px rgba(0, 0, 0, 0.45);
-      min-height: 280px;
-      animation: qaIn 650ms ease;
+      box-shadow: 0 16px 42px rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--outline);
+      isolation: isolate;
     }
 
-    @keyframes qaIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .qa-bg {
+    .memory-wall {
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(155deg, rgba(14, 9, 19, 0.52), rgba(14, 9, 19, 0.78)),
-        var(--bg-a),
-        var(--bg-b),
-        var(--bg-c);
-      background-size: cover, cover, cover, cover;
-      background-position: center;
-      filter: saturate(1.1) blur(0.2px);
+        radial-gradient(circle at 10% 20%, rgba(255, 153, 204, 0.26), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(153, 204, 255, 0.22), transparent 45%),
+        rgba(16, 12, 22, 0.76);
     }
 
-    .qa-content {
+    .memory-wall::before,
+    .memory-wall::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      mix-blend-mode: screen;
+      opacity: 0.22;
+      filter: blur(14px) saturate(1.2);
+      transform: scale(1.08);
+    }
+
+    .memory-wall::after {
+      opacity: 0.16;
+      filter: blur(24px);
+      transform: scale(1.15);
+    }
+
+    .qa-card {
       position: relative;
       z-index: 2;
-      padding: 18px 14px 14px;
-      text-align: center;
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
+      padding: 16px 14px 14px;
+      background: linear-gradient(180deg, rgba(8, 7, 14, 0.28), rgba(8, 7, 14, 0.62));
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
 
     .me-avatar {
-      width: 96px;
-      height: 96px;
+      width: 92px;
+      height: 92px;
       border-radius: 50%;
+      margin: 0 auto 10px;
       object-fit: cover;
       border: 3px solid rgba(255, 255, 255, 0.66);
-      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34);
-      margin-bottom: 10px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
     }
 
     #question {
       margin: 0 0 12px;
-      font-size: clamp(1.65rem, 7vw, 2.2rem);
-      line-height: 1.06;
+      font-size: clamp(1.6rem, 7vw, 2.1rem);
+      line-height: 1.08;
       font-weight: 880;
-      text-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      letter-spacing: -0.01em;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
     }
 
-    .sub {
-      margin: 0 0 14px;
-      color: rgba(255,255,255,0.9);
+    .subtext {
+      margin: 0 0 13px;
       font-size: 0.96rem;
+      color: rgba(255, 255, 255, 0.86);
     }
 
     .actions {
@@ -269,10 +242,9 @@
       min-width: 120px;
       padding: 12px 20px;
       font-size: 1rem;
-      font-weight: 760;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 180ms ease, filter 200ms ease;
+      font-weight: 730;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 180ms ease, background-color 220ms ease, filter 220ms ease;
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
     }
 
@@ -295,15 +267,8 @@
       margin-top: 12px;
       min-height: 26px;
       font-weight: 650;
-      color: rgba(255,255,255,0.97);
-      text-shadow: 0 2px 10px rgba(0,0,0,0.35);
-    }
-
-    #fxCanvas {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 30;
+      color: rgba(255, 255, 255, 0.96);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
     }
   </style>
 </head>
@@ -311,24 +276,20 @@
   <div class="spark-bg" id="sparkBg" aria-hidden="true"></div>
 
   <main class="app">
-    <section class="start-wrap" id="startWrap">
-      <button id="startBtn">Hardik wants you to click here</button>
-      <div class="helper">A tiny Valentine surprise is waiting ✨</div>
-    </section>
+    <button id="startBtn">Open your Valentine surprise</button>
+    <div id="introBurst" class="intro-burst" aria-hidden="true"></div>
 
     <section id="stage" aria-live="polite">
       <div class="frame">
-        <img id="slideA" class="slide" alt="memory" decoding="async" />
-        <img id="slideB" class="slide" alt="memory" decoding="async" />
-        <div id="vdayBurst" class="vday-burst" aria-hidden="true"></div>
+        <img id="photo" alt="memory" loading="eager" decoding="async" />
       </div>
 
       <div id="qa">
-        <div id="qaBg" class="qa-bg"></div>
-        <div class="qa-content">
+        <div class="memory-wall" id="memoryWall"></div>
+        <div class="qa-card">
           <img id="meAvatar" class="me-avatar" alt="Hardik" />
           <h1 id="question">Will you be my Valentine?</h1>
-          <p class="sub">Every one of these memories is my favorite.</p>
+          <p class="subtext">I made this with our favorite memories 💗</p>
           <div class="actions">
             <button id="yesBtn" class="btn">Yes</button>
             <button id="noBtn" class="btn">No</button>
@@ -357,189 +318,95 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const message = document.getElementById("message");
-    const fxCanvas = document.getElementById("fxCanvas");
-    const sparkBg = document.getElementById("sparkBg");
+    const memoryWall = document.getElementById("memoryWall");
+    const meAvatar = document.getElementById("meAvatar");
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-    const cache = new Map();
-    let topSlide = slideA;
-    let bottomSlide = slideB;
+    const optimizedCache = new Map();
 
-    function startAmbientSparks() {
-      const symbols = ["💗", "✨", "💖", "💕", "💫"];
-      for (let i = 0; i < 16; i += 1) {
-        const el = document.createElement("span");
-        el.className = "spark";
-        el.textContent = symbols[i % symbols.length];
-        el.style.left = `${Math.random() * 100}%`;
-        el.style.setProperty("--dx", `${-30 + Math.random() * 60}px`);
-        el.style.animationDuration = `${6 + Math.random() * 8}s`;
-        el.style.animationDelay = `${Math.random() * 7}s`;
-        sparkBg.appendChild(el);
-      }
-    }
-
-    function loadImage(src, timeoutMs = 3500) {
-      if (cache.has(src)) return cache.get(src);
+    async function optimizeImage(src) {
+      if (optimizedCache.has(src)) return optimizedCache.get(src);
 
       const task = new Promise((resolve) => {
         const img = new Image();
-        let done = false;
-
-        const finish = (ok) => {
-          if (done) return;
-          done = true;
-          resolve(ok ? src : null);
-        };
-
-        const timer = setTimeout(() => {
-          finish(false);
-        }, timeoutMs);
-
+        img.decoding = "async";
         img.onload = () => {
-          clearTimeout(timer);
-          finish(true);
-        };
-        img.onerror = () => {
-          clearTimeout(timer);
-          finish(false);
-        };
+          try {
+            const maxSide = 900;
+            const ratio = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(img.naturalWidth * ratio));
+            canvas.height = Math.max(1, Math.round(img.naturalHeight * ratio));
 
+            const ctx = canvas.getContext("2d", { alpha: false });
+            if (!ctx) return resolve(src);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+              if (!blob) return resolve(src);
+              resolve(URL.createObjectURL(blob));
+            }, "image/jpeg", 0.45);
+          } catch {
+            resolve(src);
+          }
+        };
+        img.onerror = () => resolve(src);
         img.src = src;
       });
 
-      cache.set(src, task);
+      optimizedCache.set(src, task);
       return task;
     }
 
-    async function crossFadeTo(src) {
-      const loaded = await loadImage(src, src === "pic3.jpg" ? 1800 : 3500);
-      if (!loaded) return false;
-
-      bottomSlide.src = loaded;
-      bottomSlide.classList.add("show");
-      topSlide.classList.remove("show");
-      await sleep(720);
-
-      const previousTop = topSlide;
-      topSlide = bottomSlide;
-      bottomSlide = previousTop;
-      return true;
+    function warmupImages(list) {
+      list.forEach((src) => {
+        optimizeImage(src);
+      });
     }
 
-    function playBurst() {
-      vdayBurst.innerHTML = "";
-      const icons = ["💘", "💖", "✨", "💞", "🌸", "💗"];
-      for (let i = 0; i < 20; i += 1) {
-        const item = document.createElement("span");
-        item.className = "burst-item";
-        item.textContent = icons[i % icons.length];
-        item.style.setProperty("--x", `${(Math.random() - 0.5) * 320}px`);
-        item.style.setProperty("--y", `${-40 - Math.random() * 260}px`);
-        item.style.animationDelay = `${Math.random() * 130}ms`;
-        vdayBurst.appendChild(item);
-      }
-      vdayBurst.classList.remove("show");
-      void vdayBurst.offsetWidth;
-      vdayBurst.classList.add("show");
+    async function show(src, holdMs) {
+      photo.classList.add("exit");
+      photo.classList.remove("show");
+      await sleep(210);
+      photo.src = await optimizeImage(src);
+      photo.classList.remove("exit");
+      photo.classList.add("show");
+      await sleep(holdMs);
     }
 
     async function decorateQuestionPanel() {
-      const [a, b, c, me] = await Promise.all([
-        loadImage(sequence[0], 3000),
-        loadImage(sequence[2], 3000),
-        loadImage(sequence[4], 3000),
-        loadImage(finalImage, 3000)
+      const [memA, memB, avatar] = await Promise.all([
+        optimizeImage(sequence[1]),
+        optimizeImage(sequence[3]),
+        optimizeImage(finalImage)
       ]);
 
-      const bgA = a || sequence[1];
-      const bgB = b || sequence[3];
-      const bgC = c || sequence[0];
+      memoryWall.style.setProperty("--bg-a", `url('${memA}')`);
+      memoryWall.style.setProperty("--bg-b", `url('${memB}')`);
+      memoryWall.style.backgroundImage =
+        `radial-gradient(circle at 10% 20%, rgba(255, 153, 204, 0.26), transparent 45%),` +
+        `radial-gradient(circle at 80% 0%, rgba(153, 204, 255, 0.22), transparent 45%),` +
+        `url('${memA}'), url('${memB}')`;
+      memoryWall.style.backgroundSize = "auto, auto, cover, cover";
+      memoryWall.style.backgroundPosition = "center, center, center, center";
+      memoryWall.style.backgroundBlendMode = "normal, normal, soft-light, screen";
 
-      qaBg.style.setProperty("--bg-a", `url('${bgA}')`);
-      qaBg.style.setProperty("--bg-b", `url('${bgB}')`);
-      qaBg.style.setProperty("--bg-c", `url('${bgC}')`);
-
-      meAvatar.src = me || finalImage;
-    }
-
-    function confettiBlast() {
-      const ctx = fxCanvas.getContext("2d");
-      if (!ctx) return;
-
-      const dpr = window.devicePixelRatio || 1;
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-
-      fxCanvas.width = Math.floor(w * dpr);
-      fxCanvas.height = Math.floor(h * dpr);
-      fxCanvas.style.width = `${w}px`;
-      fxCanvas.style.height = `${h}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const colors = ["#ff4f95", "#ffd166", "#67e8f9", "#8ef3a9", "#ffffff"];
-      const parts = Array.from({ length: 170 }, () => ({
-        x: Math.random() * w,
-        y: -10 - Math.random() * h * 0.5,
-        vx: -2 + Math.random() * 4,
-        vy: 2 + Math.random() * 4,
-        r: 4 + Math.random() * 7,
-        rot: Math.random() * Math.PI,
-        vrot: -0.3 + Math.random() * 0.6,
-        c: colors[Math.floor(Math.random() * colors.length)]
-      }));
-
-      const t0 = performance.now();
-      const duration = 2300;
-
-      function frame(now) {
-        const t = now - t0;
-        ctx.clearRect(0, 0, w, h);
-
-        for (const p of parts) {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.rot += p.vrot;
-
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.fillStyle = p.c;
-          ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 0.7);
-          ctx.restore();
-        }
-
-        if (t < duration) requestAnimationFrame(frame);
-        else ctx.clearRect(0, 0, w, h);
-      }
-
-      requestAnimationFrame(frame);
+      meAvatar.src = avatar;
     }
 
     async function startFlow() {
       startBtn.disabled = true;
-      playBurst();
+      warmupImages([...sequence.slice(1), finalImage]);
 
-      await loadImage(sequence[0], 1800);
-      sequence.slice(1).forEach((src) => loadImage(src, 3500));
-      loadImage(finalImage, 3500);
-
-      startWrap.style.transition = "opacity 420ms ease, transform 420ms ease";
-      startWrap.style.opacity = "0";
-      startWrap.style.transform = "translateY(-12px) scale(0.96)";
-      await sleep(320);
-      startWrap.style.display = "none";
-
+      await sleep(260);
+      startBtn.style.display = "none";
       stage.style.display = "block";
 
       for (const src of sequence) {
-        const ok = await crossFadeTo(src);
-        await sleep(ok ? 980 : 220);
+        await show(src, 860);
       }
 
-      await crossFadeTo(finalImage);
-      await sleep(420);
-
+      await show(finalImage, 420);
       await decorateQuestionPanel();
       qa.style.display = "block";
     }
@@ -548,7 +415,7 @@
       message.textContent = "aw, thanks to my fav person in the whole world!";
       yesBtn.disabled = true;
       noBtn.disabled = true;
-      confettiBlast();
+      yesBtn.style.filter = "brightness(1.06)";
     }
 
     function onNo() {
