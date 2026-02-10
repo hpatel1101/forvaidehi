@@ -20,7 +20,7 @@
     html, body {
       margin: 0;
       min-height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: var(--text);
       background:
         radial-gradient(1200px 800px at 50% -10%, #492657 0%, transparent 45%),
@@ -120,17 +120,17 @@
     }
 
     .frame {
+      position: relative;
       width: 100%;
       aspect-ratio: 4 / 5;
-      margin-top: 14px;
-      border-radius: 20px;
+      border-radius: 24px;
       overflow: hidden;
       position: relative;
       background: #11131a;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
     }
 
-    #photo {
+    .slide {
       position: absolute;
       inset: 0;
       width: 100%;
@@ -143,7 +143,7 @@
       filter: saturate(1.04) contrast(1.02);
     }
 
-    #photo.show {
+    .slide.show {
       opacity: 1;
       transform: scale(1);
     }
@@ -156,6 +156,7 @@
 
     #qa {
       display: none;
+      position: relative;
       margin-top: 14px;
       position: relative;
       min-height: 260px;
@@ -230,8 +231,8 @@
 
     .actions {
       display: flex;
-      justify-content: center;
       gap: 10px;
+      justify-content: center;
       flex-wrap: wrap;
     }
 
@@ -240,7 +241,6 @@
       border-radius: 14px;
       min-width: 120px;
       padding: 12px 20px;
-      color: #fff;
       font-size: 1rem;
       font-weight: 730;
       -webkit-tap-highlight-color: transparent;
@@ -248,25 +248,24 @@
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
     }
 
-    .btn:active { transform: scale(0.97); }
+    .btn:active { transform: scale(0.96); }
     #yesBtn { background: var(--yes); }
     #noBtn { background: var(--no); }
 
     #noBtn.switching {
-      animation: noToYes 420ms ease;
+      animation: switchy 420ms ease;
       background: var(--yes);
     }
 
-    @keyframes noToYes {
-      0% { transform: translateY(0) scale(1) rotate(0deg); }
-      45% { transform: translateY(-3px) scale(0.9) rotate(-7deg); }
-      100% { transform: translateY(0) scale(1) rotate(0deg); }
+    @keyframes switchy {
+      0% { transform: rotate(0deg) scale(1); }
+      40% { transform: rotate(-8deg) scale(0.9); }
+      100% { transform: rotate(0deg) scale(1); }
     }
 
     #message {
-      min-height: 26px;
       margin-top: 12px;
-      font-size: 1.02rem;
+      min-height: 26px;
       font-weight: 650;
       color: rgba(255, 255, 255, 0.96);
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
@@ -274,6 +273,8 @@
   </style>
 </head>
 <body>
+  <div class="spark-bg" id="sparkBg" aria-hidden="true"></div>
+
   <main class="app">
     <button id="startBtn">Open your Valentine surprise</button>
     <div id="introBurst" class="intro-burst" aria-hidden="true"></div>
@@ -305,10 +306,15 @@
     const sequence = ["pic1.jpg", "pic2.jpg", "pic3.jpg", "pic4.jpg", "pic5.jpg"];
     const finalImage = "me.jpg";
 
+    const startWrap = document.getElementById("startWrap");
     const startBtn = document.getElementById("startBtn");
     const stage = document.getElementById("stage");
-    const photo = document.getElementById("photo");
+    const slideA = document.getElementById("slideA");
+    const slideB = document.getElementById("slideB");
+    const vdayBurst = document.getElementById("vdayBurst");
     const qa = document.getElementById("qa");
+    const qaBg = document.getElementById("qaBg");
+    const meAvatar = document.getElementById("meAvatar");
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const message = document.getElementById("message");
@@ -422,6 +428,7 @@
       }, 120);
     }
 
+    startAmbientSparks();
     startBtn.addEventListener("click", startFlow);
     yesBtn.addEventListener("click", onYes);
     noBtn.addEventListener("click", onNo);
