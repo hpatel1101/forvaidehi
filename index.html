@@ -44,10 +44,10 @@
       width: 100%;
       min-height: 108px;
       border: 0;
-      border-radius: 24px;
-      padding: 20px 16px;
-      font-size: clamp(1.15rem, 4.4vw, 1.45rem);
-      font-weight: 780;
+      border-radius: 20px;
+      padding: 18px;
+      font-size: clamp(1.2rem, 4.7vw, 1.5rem);
+      font-weight: 760;
       letter-spacing: 0.01em;
       color: #fff;
       background:
@@ -56,10 +56,7 @@
         linear-gradient(135deg, rgba(255, 78, 128, 0.36), rgba(111, 66, 193, 0.45));
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      box-shadow:
-        0 16px 44px rgba(0, 0, 0, 0.35),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.2),
-        inset 0 -18px 28px rgba(0, 0, 0, 0.16);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1px var(--outline);
       -webkit-tap-highlight-color: transparent;
       transition: transform 180ms ease, box-shadow 220ms ease;
       cursor: pointer;
@@ -142,7 +139,7 @@
       opacity: 0;
       transform: scale(1.06);
       will-change: opacity, transform, filter;
-      transition: opacity 560ms ease, transform 1200ms ease, filter 560ms ease;
+      transition: opacity 520ms ease, transform 1100ms ease, filter 520ms ease;
       filter: saturate(1.04) contrast(1.02);
     }
 
@@ -176,6 +173,25 @@
         radial-gradient(circle at 10% 20%, rgba(255, 153, 204, 0.26), transparent 45%),
         radial-gradient(circle at 80% 0%, rgba(153, 204, 255, 0.22), transparent 45%),
         rgba(16, 12, 22, 0.76);
+    }
+
+    .memory-wall::before,
+    .memory-wall::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      mix-blend-mode: screen;
+      opacity: 0.22;
+      filter: blur(14px) saturate(1.2);
+      transform: scale(1.08);
+    }
+
+    .memory-wall::after {
+      opacity: 0.16;
+      filter: blur(24px);
+      transform: scale(1.15);
     }
 
     .qa-card {
@@ -230,7 +246,6 @@
       -webkit-tap-highlight-color: transparent;
       transition: transform 180ms ease, background-color 220ms ease, filter 220ms ease;
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
-      cursor: pointer;
     }
 
     .btn:active { transform: scale(0.97); }
@@ -255,13 +270,6 @@
       font-weight: 650;
       color: rgba(255, 255, 255, 0.96);
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-    }
-
-    #fxCanvas {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 30;
     }
   </style>
 </head>
@@ -306,22 +314,19 @@
     const message = document.getElementById("message");
     const memoryWall = document.getElementById("memoryWall");
     const meAvatar = document.getElementById("meAvatar");
-    const introBurst = document.getElementById("introBurst");
-    const fxCanvas = document.getElementById("fxCanvas");
 
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     const optimizedCache = new Map();
 
-    async function optimizeImage(src, options = {}) {
-      const cacheKey = `${src}:${options.maxSide || 760}:${options.quality || 0.33}`;
-      if (optimizedCache.has(cacheKey)) return optimizedCache.get(cacheKey);
+    async function optimizeImage(src) {
+      if (optimizedCache.has(src)) return optimizedCache.get(src);
 
       const task = new Promise((resolve) => {
         const img = new Image();
         img.decoding = "async";
         img.onload = () => {
           try {
-            const maxSide = options.maxSide || 760;
+            const maxSide = 900;
             const ratio = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
             const canvas = document.createElement("canvas");
             canvas.width = Math.max(1, Math.round(img.naturalWidth * ratio));
@@ -334,7 +339,7 @@
             canvas.toBlob((blob) => {
               if (!blob) return resolve(src);
               resolve(URL.createObjectURL(blob));
-            }, "image/jpeg", options.quality || 0.33);
+            }, "image/jpeg", 0.45);
           } catch {
             resolve(src);
           }
@@ -343,7 +348,7 @@
         img.src = src;
       });
 
-      optimizedCache.set(cacheKey, task);
+      optimizedCache.set(src, task);
       return task;
     }
 
@@ -353,51 +358,25 @@
       });
     }
 
-    async function safeOptimizedSource(src, timeoutMs = 1800) {
-      return Promise.race([
-        optimizeImage(src),
-        new Promise((resolve) => setTimeout(() => resolve(null), timeoutMs))
-      ]);
-    }
-
     async function show(src, holdMs) {
       photo.classList.add("exit");
       photo.classList.remove("show");
       await sleep(210);
-
-      const optimized = await safeOptimizedSource(src, src === "pic3.jpg" ? 1100 : 2000);
-      if (!optimized) return;
-
-      photo.src = optimized;
+      photo.src = await optimizeImage(src);
       photo.classList.remove("exit");
       photo.classList.add("show");
       await sleep(holdMs);
     }
 
-    function playIntroBurst() {
-      introBurst.innerHTML = "";
-      const symbols = ["💗", "💖", "✨", "💕", "💞", "🌸"];
-      for (let i = 0; i < 18; i += 1) {
-        const span = document.createElement("span");
-        span.className = "heart";
-        span.textContent = symbols[i % symbols.length];
-        span.style.setProperty("--x", `${(Math.random() - 0.5) * 280}px`);
-        span.style.setProperty("--y", `${-70 - Math.random() * 220}px`);
-        span.style.animationDelay = `${Math.random() * 160}ms`;
-        introBurst.appendChild(span);
-      }
-      introBurst.classList.remove("show");
-      void introBurst.offsetWidth;
-      introBurst.classList.add("show");
-    }
-
     async function decorateQuestionPanel() {
       const [memA, memB, avatar] = await Promise.all([
-        optimizeImage(sequence[1], { maxSide: 620, quality: 0.28 }),
-        optimizeImage(sequence[3], { maxSide: 620, quality: 0.28 }),
-        optimizeImage(finalImage, { maxSide: 500, quality: 0.4 })
+        optimizeImage(sequence[1]),
+        optimizeImage(sequence[3]),
+        optimizeImage(finalImage)
       ]);
 
+      memoryWall.style.setProperty("--bg-a", `url('${memA}')`);
+      memoryWall.style.setProperty("--bg-b", `url('${memB}')`);
       memoryWall.style.backgroundImage =
         `radial-gradient(circle at 10% 20%, rgba(255, 153, 204, 0.26), transparent 45%),` +
         `radial-gradient(circle at 80% 0%, rgba(153, 204, 255, 0.22), transparent 45%),` +
@@ -409,66 +388,8 @@
       meAvatar.src = avatar;
     }
 
-    function confettiYes() {
-      const ctx = fxCanvas.getContext("2d");
-      if (!ctx) return;
-
-      const dpr = window.devicePixelRatio || 1;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      fxCanvas.width = Math.floor(width * dpr);
-      fxCanvas.height = Math.floor(height * dpr);
-      fxCanvas.style.width = `${width}px`;
-      fxCanvas.style.height = `${height}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const colors = ["#ff4f92", "#ffd166", "#7ef2ff", "#9bffb0", "#ffffff"];
-      const pieces = Array.from({ length: 150 }, () => ({
-        x: Math.random() * width,
-        y: -10 - Math.random() * height * 0.4,
-        size: 4 + Math.random() * 8,
-        vy: 2 + Math.random() * 4,
-        vx: -1.5 + Math.random() * 3,
-        rot: Math.random() * Math.PI,
-        vr: -0.2 + Math.random() * 0.4,
-        color: colors[Math.floor(Math.random() * colors.length)]
-      }));
-
-      const start = performance.now();
-      const duration = 2200;
-
-      function tick(now) {
-        const elapsed = now - start;
-        ctx.clearRect(0, 0, width, height);
-
-        pieces.forEach((p) => {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.rot += p.vr;
-
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.72);
-          ctx.restore();
-        });
-
-        if (elapsed < duration) {
-          requestAnimationFrame(tick);
-        } else {
-          ctx.clearRect(0, 0, width, height);
-        }
-      }
-
-      requestAnimationFrame(tick);
-    }
-
     async function startFlow() {
       startBtn.disabled = true;
-      playIntroBurst();
-
-      await safeOptimizedSource(sequence[0], 1300);
       warmupImages([...sequence.slice(1), finalImage]);
 
       await sleep(260);
@@ -476,10 +397,10 @@
       stage.style.display = "block";
 
       for (const src of sequence) {
-        await show(src, 920);
+        await show(src, 860);
       }
 
-      await show(finalImage, 440);
+      await show(finalImage, 420);
       await decorateQuestionPanel();
       qa.style.display = "block";
     }
@@ -489,7 +410,6 @@
       yesBtn.disabled = true;
       noBtn.disabled = true;
       yesBtn.style.filter = "brightness(1.06)";
-      confettiYes();
     }
 
     function onNo() {
