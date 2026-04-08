@@ -1,0 +1,14 @@
+{
+  "households": [
+    {
+      "inviteCode": "HV001",
+      "displayName": "Patel Family",
+      "members": ["Krish Patel", "Parita Patel", "Dhaval Patel"]
+    },
+    {
+      "inviteCode": "HV002",
+      "displayName": "Amin Family",
+      "members": ["Dilip Amin", "Urmila Amin"]
+    }
+  ]
+}
