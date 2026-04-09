@@ -25,7 +25,7 @@ main { min-height: 100vh; }
 .narrow { width: min(calc(100% - 2rem), 760px); }
 
 .site-header {
-  padding: 2.5rem 0 1.5rem;
+  padding: 2.5rem 0 0.75rem;
 }
 .header-inner {
   display: flex;
@@ -72,7 +72,7 @@ main { min-height: 100vh; }
 }
 
 .hero-image-wrap {
-  padding: 1.5rem 0 0.5rem;
+  padding: 0.75rem 0 0.1rem;
 }
 .hero-image-card {
   width: min(100%, 780px);
@@ -96,6 +96,7 @@ main { min-height: 100vh; }
   padding: 2.5rem 0;
 }
 #details {
+  padding-top: 1.5rem;
   padding-bottom: 1rem;
 }
 #rsvp {
