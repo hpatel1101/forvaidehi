@@ -15,21 +15,58 @@ function normalize(value) {
   return (value ?? '').trim().toLowerCase();
 }
 
-function buildScore(row, query) {
-  const full = row.fullName.toLowerCase();
-  const first = row.firstName.toLowerCase();
-  const last = row.lastName.toLowerCase();
-  const party = row.partyName.toLowerCase();
+function tokenize(value) {
+  return normalize(value).split(/\s+/).filter(Boolean);
+}
 
-  if (full === query) return 100;
-  if (first === query || last === query) return 90;
-  if (party === query) return 80;
-  if (full.startsWith(query)) return 70;
-  if (first.startsWith(query) || last.startsWith(query)) return 60;
-  if (party.startsWith(query)) return 50;
-  if (full.includes(query)) return 40;
-  if (first.includes(query) || last.includes(query)) return 30;
-  if (party.includes(query)) return 20;
+function matchToken(queryToken, targetToken) {
+  if (!queryToken || !targetToken) return 0;
+  if (queryToken === targetToken) return 100;
+
+  const ratio = queryToken.length / targetToken.length;
+
+  if (queryToken.length >= 2 && targetToken.startsWith(queryToken) && ratio >= 0.5) {
+    return 75;
+  }
+
+  if (queryToken.length >= 3 && targetToken.includes(queryToken) && ratio >= 0.5) {
+    return 60;
+  }
+
+  return 0;
+}
+
+function matchField(queryTokens, fieldValue) {
+  const targetTokens = tokenize(fieldValue);
+  if (!queryTokens.length || !targetTokens.length) return 0;
+
+  const scores = queryTokens.map((queryToken) =>
+    Math.max(...targetTokens.map((targetToken) => matchToken(queryToken, targetToken)), 0)
+  );
+
+  if (scores.some((score) => score === 0)) return 0;
+
+  const exactMatches = scores.filter((score) => score === 100).length;
+  return Math.min(...scores) + exactMatches;
+}
+
+function buildScore(row, query) {
+  const queryTokens = tokenize(query);
+  if (!queryTokens.length) return 0;
+
+  if (queryTokens.length === 1 && queryTokens[0].length < 2) return 0;
+
+  const fullScore = matchField(queryTokens, row.fullName);
+  const firstScore = matchField(queryTokens, row.firstName);
+  const lastScore = matchField(queryTokens, row.lastName);
+  const partyScore = matchField(queryTokens, row.partyName);
+
+  if (fullScore === 101 || fullScore === 100) return 100;
+  if (firstScore === 100 || lastScore === 100) return 92;
+  if (partyScore === 100) return 88;
+  if (fullScore > 0) return Math.min(85, fullScore);
+  if (firstScore > 0 || lastScore > 0) return Math.min(80, Math.max(firstScore, lastScore));
+  if (partyScore > 0) return Math.min(72, partyScore);
   return 0;
 }
 
