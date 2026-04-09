@@ -109,7 +109,6 @@ export default function Page() {
           <p className="meta">August 8, 2026 • 5:00 PM • Cartersville, GA</p>
           <nav className="nav">
             <a href="#details">Details</a>
-            <a href="#schedule">Schedule</a>
             <a href="#rsvp">RSVP</a>
           </nav>
         </div>
@@ -132,19 +131,6 @@ export default function Page() {
             <h2>Saturday, August 8, 2026</h2>
             <p>5:00 PM · Clarence Brown Conference Center</p>
             <p>5450 GA-20, Cartersville, GA 30121</p>
-          </div>
-        </div>
-      </section>
-
-      <section className="section muted-section" id="schedule">
-        <div className="container narrow">
-          <div className="section-heading center">
-            <p className="eyebrow">Schedule</p>
-          </div>
-          <div className="timeline-simple">
-            <div className="timeline-row"><span>5:00 PM</span><p>Mocktail hour</p></div>
-            <div className="timeline-row"><span>6:00 PM – 8:00 PM</span><p>Program</p></div>
-            <div className="timeline-row"><span>8:00 PM</span><p>Dinner</p></div>
           </div>
         </div>
       </section>
