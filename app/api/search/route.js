@@ -22,13 +22,7 @@ export async function GET(request) {
     if (!query) return NextResponse.json({ error: 'Missing search query.' }, { status: 400 });
 
     const supabase = getClient();
-    const { data, error } = await supabase
-      .from('guests')
-      .select('id, "Party (Optional)", "First Name", "Last Name", attending')
-      .order('Party (Optional)', { ascending: true, nullsFirst: false })
-      .order('Last Name', { ascending: true, nullsFirst: false })
-      .order('First Name', { ascending: true, nullsFirst: false });
-
+    const { data, error } = await supabase.from('guests').select('*').order('id', { ascending: true });
     if (error) throw error;
 
     const rows = (data ?? []).map((row) => {
@@ -36,14 +30,7 @@ export async function GET(request) {
       const lastName = row['Last Name'] ?? '';
       const partyName = row['Party (Optional)'] ?? '';
       const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
-      return {
-        id: row.id,
-        fullName,
-        firstName,
-        lastName,
-        partyName: partyName || fullName,
-        attending: row.attending ?? '',
-      };
+      return { id: row.id, fullName, firstName, lastName, partyName: partyName || fullName, attending: row.attending ?? '' };
     });
 
     const matched = rows.find((row) => [row.fullName, row.firstName, row.lastName, row.partyName].join(' | ').toLowerCase().includes(query));

@@ -11,14 +11,11 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const updates = Array.isArray(body.updates) ? body.updates : [];
-
-    if (!updates.length) {
-      return NextResponse.json({ error: 'No RSVP updates provided.' }, { status: 400 });
-    }
+    if (!updates.length) return NextResponse.json({ error: 'No RSVP updates provided.' }, { status: 400 });
 
     for (const item of updates) {
-      const value = item.attending === 'Attending' ? 'Attending' : 'Not attending';
-      const { error } = await supabase.from('guests').update({ attending: value }).eq('id', item.id);
+      const attending = item.attending === 'Attending' ? 'Attending' : 'Not attending';
+      const { error } = await supabase.from('guests').update({ attending }).eq('id', item.id);
       if (error) throw error;
     }
 
