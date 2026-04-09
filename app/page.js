@@ -129,10 +129,9 @@ export default function Page() {
             <p className="eyebrow">Schedule</p>
           </div>
           <div className="timeline-simple">
-            <div className="timeline-row"><span>4:30 PM</span><p>Guest arrival · Clarence Brown Conference Center</p></div>
-            <div className="timeline-row"><span>5:00 PM</span><p>Celebration begins</p></div>
-            <div className="timeline-row"><span>6:00 PM</span><p>Dinner</p></div>
-            <div className="timeline-row"><span>7:30 PM</span><p>Music and dancing</p></div>
+            <div className="timeline-row"><span>5:00 PM</span><p>Mocktail hour</p></div>
+            <div className="timeline-row"><span>6:00 PM – 8:00 PM</span><p>Program</p></div>
+            <div className="timeline-row"><span>8:00 PM</span><p>Dinner</p></div>
           </div>
         </div>
       </section>
