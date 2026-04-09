@@ -267,6 +267,9 @@ input[type='text'] {
   .hero-image-card {
     width: 100%;
   }
+  .hero-image-placeholder {
+    aspect-ratio: 1 / 1.2;
+  }
   .hero-image {
     object-position: center 25%;
   }
