@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+const SITE_ACCESS_CODE = 'hv2026';
+const ACCESS_STORAGE_KEY = 'hv_site_access';
 
 export default function Page() {
   const [query, setQuery] = useState('');
@@ -13,6 +16,39 @@ export default function Page() {
   const [submitError, setSubmitError] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [accessCode, setAccessCode] = useState('');
+  const [accessError, setAccessError] = useState('');
+  const [hasAccess, setHasAccess] = useState(false);
+  const [accessChecked, setAccessChecked] = useState(false);
+
+  useEffect(() => {
+    try {
+      const storedAccess = window.sessionStorage.getItem(ACCESS_STORAGE_KEY);
+      if (storedAccess === 'granted') {
+        setHasAccess(true);
+      }
+    } catch (error) {
+      // Ignore storage access issues and fall back to code entry.
+    } finally {
+      setAccessChecked(true);
+    }
+  }, []);
+
+  function handleAccessSubmit(event) {
+    event.preventDefault();
+    if (accessCode.trim() === SITE_ACCESS_CODE) {
+      setHasAccess(true);
+      setAccessError('');
+      try {
+        window.sessionStorage.setItem(ACCESS_STORAGE_KEY, 'granted');
+      } catch (error) {
+        // Ignore storage access issues after successful validation.
+      }
+      return;
+    }
+
+    setAccessError('Incorrect code. Please try again.');
+  }
 
   function chooseParty(selectedParty) {
     setParty(selectedParty);
@@ -86,6 +122,52 @@ export default function Page() {
     } finally {
       setSaving(false);
     }
+  }
+
+  if (!accessChecked) {
+    return <main />;
+  }
+
+  if (!hasAccess) {
+    return (
+      <main>
+        <style jsx global>{`
+          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&display=swap');
+
+          .names {
+            font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+            font-size: clamp(3.2rem, 7vw, 5rem);
+            font-weight: 300;
+            letter-spacing: 0.03em;
+            text-transform: none;
+            line-height: 0.95;
+          }
+        `}</style>
+        <section className="section" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>
+          <div className="container narrow">
+            <div className="card rsvp-shell" style={{ textAlign: 'center' }}>
+              <p className="eyebrow">Private access</p>
+              <p className="names" style={{ fontSize: 'clamp(2.4rem, 6vw, 4rem)', marginBottom: '0.75rem' }}>Hardik &amp; Vaidehi</p>
+              <p className="message" style={{ marginBottom: '1.25rem' }}>Enter the access code to continue.</p>
+              <form className="lookup-form" onSubmit={handleAccessSubmit}>
+                <label htmlFor="accessCode">Access code</label>
+                <input
+                  id="accessCode"
+                  type="password"
+                  placeholder="Enter code"
+                  value={accessCode}
+                  onChange={(e) => setAccessCode(e.target.value)}
+                  autoComplete="off"
+                  required
+                />
+                <button className="button primary full-width" type="submit">Enter site</button>
+                {accessError ? <p className="message error">{accessError}</p> : null}
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   return (
